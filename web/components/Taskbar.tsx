@@ -8,7 +8,7 @@ import {
 
 const Taskbar = () => {
   return (
-    <div className="flex rounded-xl mx-auto max-w-5xl my-5 shadow-lg bg-slate-800 p-4 px-9">
+    <div className="flex rounded-xl mx-auto max-w-5xl my-5 shadow-lg bg-slate-700 p-4 px-9">
       <text className="text-4xl public-xl text-slate-100 mr-auto">
         Connect4Online
       </text>
