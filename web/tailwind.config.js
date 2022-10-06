@@ -5,7 +5,13 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+      },
+      animation: {
+        bounce2: "bounce2 1s ease 0s infinite normal forwards"
+      },
+    },
   },
   plugins: [],
-}
+};

@@ -8,7 +8,7 @@ body {
   margin: 0;
   font-family: "Public Sans", sans-serif;
   color: white;
-  background: rgb(15 23 42);;
+  background: rgb(15 23 42);
 }
 
 a {
@@ -31,4 +31,51 @@ a {
 }
 .public-xl {
   font-weight: 800;
+}
+
+.inner-shadow-lg {
+  --tw-shadow: inset 0 2rem 2rem 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: inset 0 2rem 2rem 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.cls-1 {
+  fill: #0b1b3f;
+}
+.cls-2 {
+  fill: #f55;
+}
+.cls-3 {
+  fill: #ffe75a;
+}
+
+@keyframes bounce2 {
+  0% {
+    transform: translateY(0);
+  }
+  15% {
+    transform: translateY(40.5%);
+  }
+  25% {
+    transform: translateY(32%);
+  }
+  35% {
+    transform: translateY(40.5%);
+  }
+  45% {
+    transform: translateY(37%);
+  }
+  55% {
+    transform: translateY(40.5%);
+  }
+  60% {
+    transform: translateY(38%);
+  }
+  65% {
+    transform: translateY(40.5%);
+  }
+  100% {
+    transform: translateY(40.5%);
+  }
 }
