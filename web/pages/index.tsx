@@ -4,6 +4,8 @@ import Taskbar from "../components/Taskbar";
 
 
 const Home: NextPage = () => {
+  const handleSubmit = (e) => e.preventDefault()
+
   return (
     <div className="mx-4">
       <Taskbar />
