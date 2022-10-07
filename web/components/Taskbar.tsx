@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 
 export const myUser = {id: 1, username:"bob"};
 
-const Taskbar = ({ passUser }) => {
+const Taskbar = ({ passUser } : {passUser?}) => {
   const [user, setUser] = useState<any>();
 
   useEffect(() => {
