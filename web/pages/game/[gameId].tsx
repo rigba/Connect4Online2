@@ -19,13 +19,13 @@ const res = {
   winner: 0
 }
 
+const myCol = 1
 
 
 
 const Game: NextPage = () => {
   const [gameBoard, setGameBoard] = useState([[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 2, 0], [0, 0, 1, 2, 0, 1, 0]],)
   const [isTurn, setIsTurn] = useState(0)
-  const [myCol, setMyCol] = useState(2)
   const [hovered, setHovered] = useState<[number, number]>([9, 9]);
   const router = useRouter()
   const { gameId } = router.query
@@ -41,7 +41,7 @@ const Game: NextPage = () => {
     return [gameBoard.length - 1, column]
   }
 
-  async function startTimer() {
+  function startTimer() {
 
     let time = setInterval(() => {
       setTimer({ ...timer, timePassed: timer.timePassed += 1 });
@@ -66,7 +66,7 @@ const Game: NextPage = () => {
             const row = val.map((val2, j) => {
 
               return (
-                <div className="inline-block relative" key={`${i}-${j}-grid`}>
+                <div className="inline-block relative tile-stroke" key={`${i}-${j}-grid`}>
                   <svg className="absolute w-full h-full" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" onMouseEnter={() => setHovered(findDrop(j))}>
                     <path d="M-1.047-1.397H500.35V500H-1.047V-1.397Zm253.506 48.643c-112.112 0-202.993 90.881-202.993 202.993 0 112.106 90.881 202.987 202.993 202.987 112.111 0 202.992-90.881 202.992-202.987 0-112.112-90.881-202.993-202.992-202.993Z" className="fill-blue-700" />
                   </svg>
@@ -110,13 +110,6 @@ const Game: NextPage = () => {
 
               </span>
             </div>
-            <button className="group inline-flex items-center rounded-md bg-rose-400 px-3 py-2 text-base font-medium text-white">
-              <ClockIcon
-                onClick={() => startTimer()}
-                className="h-5 w-5 transition duration-150 ease-in-out text-opacity-70 text-white group-hover:text-opacity-100"
-                aria-hidden="true"
-              />
-            </button>
 
           </div>
         </div>

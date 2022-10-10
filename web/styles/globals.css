@@ -76,7 +76,13 @@ a {
   stroke-linecap: round;
 }
 
-.a{
+.tile-stroke {
+  stroke-width: 1rem;
+  stroke: #1d4ed8;
+
+}
+
+.a {
   stroke-dasharray: 283 283;
 }
 
