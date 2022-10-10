@@ -16,7 +16,7 @@ const Home: NextPage = () => {
         <form className="rounded-xl mx-4 max-w-xl shadow-lg bg-slate-700 p-4 px-9 h-fit my-auto" onSubmit={handleSubmit}>
           <div className="grid w-full text-center flex-col justify-center h-fit">
             <text className="public-lg text-xl mb-5">
-              Play Connect 4 Online With Friends
+              Play Connect 4 Online With Friends!
             </text>
             <div className="mx-10">
               <label className="block mb-2 text-xs font-medium text-gray-900 dark:text-gray-300 text-left">
