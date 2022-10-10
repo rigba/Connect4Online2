@@ -7,20 +7,23 @@ import {
 } from "@heroicons/react/20/solid";
 import { useEffect, useState } from "react";
 
-export const myUser = {id: 1, username:"bob"};
+export const myUser = { id: 1, username: "bob" };
 
-const Taskbar = ({ passUser } : {passUser?}) => {
+const Taskbar = ({ passUser }: {passUser?}) => {
   const [user, setUser] = useState<any>();
 
   useEffect(() => {
     setUser(myUser);
-    passUser(user);
+    if (!passUser){
+      return
+    }
+    passUser(user)
   }, [user]);
 
   return (
-    <div className="flex rounded-xl mx-auto max-w-5xl my-5 shadow-lg bg-slate-700 p-4 px-9">
-      <text className="text-4xl public-xl text-slate-100 mr-auto">
-        Connect4Online
+    <div className="flex rounded-xl mx-auto max-w-5xl my-5 shadow-lg bg-slate-700 p-4 px-4">
+      <text className="text-2xl md:text-4xl public-xl text-slate-100 mr-auto my-auto">
+      Connect4Online
       </text>
       <Popover className="relative">
         {({ open }) => (
@@ -85,7 +88,7 @@ const Taskbar = ({ passUser } : {passUser?}) => {
       </Popover>
       <button className="group inline-flex items-center rounded-md bg-rose-400 px-3 py-2 text-base font-medium text-white ml-2">
         <PlusIcon
-          className="h-5 w-5 text-white transition duration-150 ease-in-out text-opacity-70 text-white group-hover:text-opacity-100"
+          className="h-5 w-5 transition duration-150 ease-in-out text-opacity-70 text-white group-hover:text-opacity-100"
           aria-hidden="true"
         />
       </button>
