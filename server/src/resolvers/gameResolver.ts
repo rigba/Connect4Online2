@@ -32,6 +32,7 @@ export class gameResolver {
         game.users = [user]
         game.gameBoard = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]
         game.gameUUID = uuidv4()
+        game.whoseMove = 0
 
         try {
             await Game.save(game);
