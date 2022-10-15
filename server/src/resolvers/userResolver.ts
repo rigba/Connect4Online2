@@ -38,11 +38,7 @@ export class userResolver {
 
         try {
             const savedUser = await User.save(user);
-            console.log("balls")
             req.session.userId = savedUser.id;
-            console.log("dasdiuhiash" + req.session.userId)
-            console.log("dasdiuhiash" + req.session)
-            console.log("balls")
         } catch (err) {
             if (err.code === "23505") {
                 throw new Error("Username taken")
