@@ -21,7 +21,7 @@ require('dotenv').config();
 @Resolver(Game)
 export class gameResolver {
     @Query(() => Game, { nullable: true })
-    async createGame(@Ctx() { req, }: MyContext, @PubSub() pubSub: PubSubEngine): Promise<Game> {
+    async createGame(@Ctx() { req }: MyContext): Promise<Game> {
         const game = new Game();
 
         const user = await User.findOne({ where: { id: req.session.userId } });
@@ -36,72 +36,8 @@ export class gameResolver {
         try {
             await Game.save(game);
         } catch (err) {
-            throw new Error("Game could not save");
-        }
-        pubSub.publish(String(game.id), game)
-        return game
-    }
-
-    @Mutation(() => Game, { nullable: true })
-    async joinGame(@Ctx() { req, }: MyContext, @PubSub() pubSub: PubSubEngine, @Arg("gameId") gameId: number): Promise<Game> {
-        const game = await Game.findOne({ where: { id: gameId } });
-        if (!game) {
-            throw new Error("Game does not exist!")
-        }
-
-        const user = await User.findOne({ where: { id: req.session.userId } });
-        if (!user) {
             throw new Error("Not Logged In");
         }
-
-        if (game.users[0].id === user.id) {
-            throw new Error("Cant join own game")
-        }
-
-        if (game.users.length === 2) {
-            throw new Error("Game is full")
-        }
-
-        try {
-            await Game.save(game);
-        } catch (err) {
-            throw new Error("Game could not save");
-        }
-        pubSub.publish(String(game.id), game)
-        return game
-    }
-
-    @Subscription(() => Game, { topics: (payload) => payload.args.gameId })
-    async gameSubscription(@Root() payLoad: any, @Arg("gameId") _: string): Promise<Game | null> {
-        return payLoad;
-    }
-
-    @Mutation(() => Game, { nullable: true })
-    async moveBoard(@Ctx() { req, }: MyContext, @PubSub() pubSub: PubSubEngine, @Arg("pieceLocation") pieceLocation: [number, number], @Arg("gameId") gameId: number): Promise<Game> {
-        const game = await Game.findOne({ where: { id: gameId } });
-        if (!game) {
-            throw new Error("Game does not exist!")
-        }
-
-        const user = await User.findOne({ where: { id: req.session.userId } });
-        if (!user) {
-            throw new Error("Not Logged In");
-        }
-
-        if (game.users[0].id === user.id) {
-            throw new Error("Cant join own game")
-        }
-
-        if (game.users.length === 2) {
-            throw new Error("Game is full")
-        }
-
-        try {
-            await Game.save(game);
-        } catch (err) {
-            throw new Error("Not Logged In");
-        }
-        pubSub.publish(String(game.id), game)
         return game
     }
 
