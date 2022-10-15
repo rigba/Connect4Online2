@@ -9,7 +9,7 @@ export type messageType = [string, string]
 export class Game extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: string;
+  id!: number;
 
   @ManyToOne(() => User, (user) => user.games)
   @JoinColumn()
