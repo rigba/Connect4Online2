@@ -11,8 +11,9 @@ import { userResolver } from "./resolvers/userResolver";
 import { RedisPubSub } from "graphql-redis-subscriptions";
 import { createServer } from 'http';
 import {
-  ApolloServerPluginDrainHttpServer,
-  ApolloServerPluginLandingPageLocalDefault,
+    ApolloServerPluginDrainHttpServer,
+    ApolloServerPluginLandingPageLocalDefault,
+    ApolloServerPluginLandingPageGraphQLPlayground
 } from "apollo-server-core";
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
@@ -80,7 +81,7 @@ const conn = async () => {
     const pubSub = new RedisPubSub({
         publisher: new Redis(),
         subscriber: new Redis(),
-      });
+    });
 
     const schema = await buildSchema({
         resolvers: [gameResolver, userResolver],
@@ -135,7 +136,7 @@ const conn = async () => {
 }
 
 conn();
-function ApolloServerPluginLandingPageGraphQLPlayground(): import("apollo-server-core").PluginDefinition {
-    throw new Error("Function not implemented.");
-}
+
+
+
 
