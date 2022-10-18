@@ -67,7 +67,12 @@ const Game: NextPage = () => {
 
               return (
                 <div className="inline-block relative tile-stroke" key={`${i}-${j}-grid`}>
-                  <svg className="absolute w-full h-full" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" onMouseEnter={() => setHovered(findDrop(j))}>
+                  <svg className={`
+                  ${i == 0 && j == 0 ? "rounded-tl-2xl" : null}
+                  ${i == 0 && j == 6 ? "rounded-tr-2xl" : null} 
+                  ${i == 5 && j == 0 ? "rounded-bl-2xl" : null} 
+                  ${i == 5 && j == 6 ? "rounded-br-2xl" : null} 
+                  absolute w-full h-full`} viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" onMouseEnter={() => setHovered(findDrop(j))}>
                     <path d="M-1.047-1.397H500.35V500H-1.047V-1.397Zm253.506 48.643c-112.112 0-202.993 90.881-202.993 202.993 0 112.106 90.881 202.987 202.993 202.987 112.111 0 202.992-90.881 202.992-202.987 0-112.112-90.881-202.993-202.992-202.993Z" className="fill-blue-700" />
                   </svg>
 
