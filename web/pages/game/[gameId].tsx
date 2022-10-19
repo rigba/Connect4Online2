@@ -77,7 +77,8 @@ const Game: NextPage = () => {
                   </svg>
 
                   <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse className={`${val2 === 0 ? "fill-transparent" : val2 === 1 ? "fill-red-500" : "fill-yellow-500"} ${hovered[0] === i && hovered[1] === j ? `hover-ani ${myCol === 1 ? "fill-red-500" : "fill-yellow-500"}` : " "}`} cx="250.349" cy="248.603" rx="248.953" ry="248.953" />
+                    <ellipse className={`${val2 === 0 ? (hovered[0] === i && hovered[1] === j ? `hover-ani ${myCol == 1 ? "fill-red-500" : "fill-yellow-500"}` : "fill-blue-900") 
+                    : val2 === 1 ? "fill-red-500" : "fill-yellow-500"}`} cx="250.349" cy="248.603" rx="248.953" ry="248.953" />
                   </svg>
 
 
