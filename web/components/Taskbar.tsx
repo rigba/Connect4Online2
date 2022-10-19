@@ -21,9 +21,20 @@ const Taskbar = ({ passUser }: {passUser?}) => {
   }, [user]);
 
   return (
-    <div className="flex rounded-xl mx-auto max-w-5xl my-5 shadow-lg bg-slate-700 p-4 px-4">
-      <text className="text-2xl md:text-4xl public-xl text-slate-100 mr-auto my-auto">
-      Connect4Online
+    <div className="flex rounded-xl mx-auto max-w-4xl shadow-lg my-5 bg-gray-700 p-4 px-4">
+      <text className="text-2xl md:text-5xl public-xl text-slate-100 mr-auto my-auto shadow-md">
+        <div className="bg-blue-700 grid grid-flow-col gap-3 py-1 px-4 rounded-md">
+          <h1 className="text-red-500 my-auto">C</h1>
+          <h1 className="text-yellow-500 m-auto">F</h1>
+          <h1 className="text-blue-900 m-auto">O</h1>
+          <svg
+            className="h-full pt-2 pb-1 mx-auto m-auto"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle className="fill-red-500" cx="50" cy="50" r="45" />
+          </svg>
+        </div>
       </text>
       <Popover className="relative">
         {({ open }) => (
