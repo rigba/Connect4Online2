@@ -12,14 +12,12 @@ import { RedisPubSub } from "graphql-redis-subscriptions";
 import { createServer } from 'http';
 import {
     ApolloServerPluginDrainHttpServer,
-    ApolloServerPluginLandingPageLocalDefault,
-    ApolloServerPluginLandingPageGraphQLPlayground
-} from "apollo-server-core";
+    ApolloServerPluginLandingPageLocalDefault,} from "apollo-server-core";
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
-/*
+
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: "localhost",
@@ -91,11 +89,9 @@ const conn = async () => {
     const server = new ApolloServer({
         schema,
         plugins: [
-            ApolloServerPluginLandingPageGraphQLPlayground(),
             ApolloServerPluginLandingPageLocalDefault({ embed: true }),
             // Proper shutdown for the HTTP server.
             ApolloServerPluginDrainHttpServer({ httpServer }),
-
             // Proper shutdown for the WebSocket server.
             {
                 async serverWillStart() {
@@ -135,46 +131,4 @@ const conn = async () => {
 }
 conn();
 
-*/
-const isWinner = (
-    _gameBoard: number[][],
-    _proposedMove: [number, number],
-    _colorNumber: number
-) => {
-    const [oneDimesionalVectors, twoDimensionalDirections] = [
-        [[1, 2, 3], // X 1 1 1
-        [-1, 1, 2], // 1 X 1 1
-        [-2, -1, 1], // 1 1 X 1
-        [-3, -2, -1], // 1 1 1 X
-        ], [
-            [true, false], // vertical
-            [false, true], // hortizontal
-            [true, true], // diagonal
-        ]]
 
-    const twoDimensionalVectors = twoDimensionalDirections.map((directions) => {
-        return oneDimesionalVectors.map((oneDVectors) => {
-            return [
-                [directions[0] ? oneDVectors[0] : 0, directions[1] ? oneDVectors[0] : 0],
-                [directions[0] ? oneDVectors[1] : 0, directions[1] ? oneDVectors[1] : 0],
-                [directions[0] ? oneDVectors[2] : 0, directions[1] ? oneDVectors[2] : 0],
-            ];
-        });
-    }); // [[[0, 1], [0, 2] [0, 3], [...], [...], [...]], [...], [...]]
-    twoDimensionalVectors.flat(1) // un-nests array [[0, 1], [...], [...], ...]
-
-    for (let vectorGroup in twoDimensionalVectors) {
-        for (vectorGroup in twoDimensionalDirections) { }
-    }
-
-};
-
-isWinner(
-    [[0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1],
-    [0, 0, 0, 1, 1, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0, 0, 1]],
-    [2, 3],
-    1)
