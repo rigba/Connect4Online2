@@ -1,23 +1,25 @@
-import { Popover, Transition } from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 import {
   UserIcon,
   PencilSquareIcon,
   TrashIcon,
   PlusIcon,
+  HandRaisedIcon,
+  PencilIcon,
 } from "@heroicons/react/20/solid";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 
 export const myUser = { id: 1, username: "bob" };
 
-const Taskbar = ({ passUser }: {passUser?}) => {
+const Taskbar = ({ passUser }: { passUser? }) => {
   const [user, setUser] = useState<any>();
 
   useEffect(() => {
     setUser(myUser);
-    if (!passUser){
-      return
+    if (!passUser) {
+      return;
     }
-    passUser(user)
+    passUser(user);
   }, [user]);
 
   return (
@@ -36,73 +38,108 @@ const Taskbar = ({ passUser }: {passUser?}) => {
           </svg>
         </div>
       </text>
-      <Popover className="relative">
-        {({ open }) => (
-          <>
-            <Popover.Button
-              className={`
-          ${open ? "" : "text-opacity-90"}
-          group inline-flex items-center rounded-md bg-slate-700 px-3 py-2 text-base font-medium text-white hover:text-opacity-100 h-full`}
-            >
-              <UserIcon
-                className={`${open ? "" : "text-opacity-70"}
-            h-5 w-5 text-white transition duration-150 ease-in-out group-hover:text-opacity-100`}
-                aria-hidden="true"
-              />
-            </Popover.Button>
-            <Transition
-              enter="transition ease-out duration-200"
-              enterFrom="opacity-0 translate-y-1"
-              enterTo="opacity-100 translate-y-0"
-              leave="transition ease-in duration-150"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 translate-y-1"
-            >
-              <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-sm -translate-x-1/2 transform px-4 text-black">
-                <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                  {user === undefined ? (
-                    <>
-                      <div className="relative bg-white p-7 lg:grid-cols-2">
-                        You are currently not logged in!
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="relative bg-white p-7 lg:grid-cols-2">
-                        {`Welcome back ${user.username.toUpperCase()}! `}
-                      </div>
-                      <div className="relative grid gap-4 bg-white p-7 lg:grid-cols-2">
-                        <button className="flex center text-blue-600 outline rounded-lg w-full ring-0 focus:ring-8 ring-blue-300">
-                          <PencilSquareIcon
-                            /* for editing name */
-                            className="text-opacity-70 h-8 w-8 my-auto mx-2"
-                            aria-hidden="true"
-                          />
-                          Username Change
-                        </button>
-                        <button className="flex center text-rose-600 outline rounded-lg ring-0 focus:ring-8 ring-rose-300">
-                          <TrashIcon
-                            /* for deleting account */
-                            className="text-opacity-70 h-8 w-8 my-auto mx-2"
-                            aria-hidden="true"
-                          />
-                          Delete Account
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </Popover.Panel>
-            </Transition>
-          </>
-        )}
-      </Popover>
-      <button className="group inline-flex items-center rounded-md bg-rose-400 px-3 py-2 text-base font-medium text-white ml-2">
+
+      <button className="shadow-md group inline-flex items-center rounded-md bg-red-500 text-base font-medium text-white mr-2 h-full px-3 py-3 my-auto">
         <PlusIcon
           className="h-5 w-5 transition duration-150 ease-in-out text-opacity-70 text-white group-hover:text-opacity-100"
           aria-hidden="true"
         />
       </button>
+      <Menu as="div" className="relative my-auto">
+        <>
+          <Menu.Button
+            className={` shadow-md
+          group inline-flex items-center rounded-md bg-blue-700 text-base font-medium text-white hover:text-opacity-100 px-3 py-3`}
+          >
+            <UserIcon
+              className={`
+            h-5 w-5 text-white transition duration-150 ease-in-out group-hover:text-opacity-100`}
+              aria-hidden="true"
+            />
+          </Menu.Button>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              {user === undefined ? (
+                <>
+                  <div className="px-1 py-1 ">
+                    <Menu.Item>
+                      {({}) => (
+                        <button
+                          className={`text-gray-900 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          <UserIcon
+                            className="mr-2 h-5 w-5"
+                            aria-hidden="true"
+                          />
+                          Edit
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="px-1 py-1 ">
+                    <Menu.Item>
+                      {({}) => (
+                        <button
+                          className={`text-gray-900 group flex w-full items-center rounded-md px-2 py-2 text-sm `}
+                        >
+                          <HandRaisedIcon
+                            className="mr-2 h-5 w-5"
+                            aria-hidden="true"
+                          />
+                          {`Welcome back ${user.username.toUpperCase()}! `}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                  <div className="px-1 py-1 ">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active ? "bg-gray-400 text-white" : "text-blue-500"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          <PencilIcon
+                            className="mr-2 h-5 w-5"
+                            aria-hidden="true"
+                          />
+                          Edit Username
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active ? "bg-gray-400 text-white" : "text-red-500"
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          <TrashIcon
+                            className="mr-2 h-5 w-5"
+                            aria-hidden="true"
+                          />
+                          Delete Account
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </>
+              )}
+            </Menu.Items>
+          </Transition>
+        </>
+      </Menu>
     </div>
   );
 };
