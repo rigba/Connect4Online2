@@ -60,13 +60,13 @@ const Game: NextPage = () => {
   return (
     <div className="mx-4">
       <Taskbar />
-      <div className="flex flex-wrap flex-row justify-center my-5 gap-5 rounded-lg bg-slate-800 max-w-4xl mx-auto p-5 group inner-shadow-lg" onClick={() => console.log(hovered)}>
+      <div className="flex flex-wrap flex-row justify-center gap-5 rounded-lg bg-gray-700 max-w-4xl mx-auto p-5 group shadow-2xl" onClick={() => console.log(hovered)}>
         <div className="gameBoard w-full max-w-lg">
           {gameBoard.map((val, i) => {
             const row = val.map((val2, j) => {
 
               return (
-                <div className="inline-block relative tile-stroke" key={`${i}-${j}-grid`}>
+                <div className="inline-block relative z-0 tile-stroke" key={`${i}-${j}-grid`}>
                   <svg className={`
                   ${i == 0 && j == 0 ? "rounded-tl-2xl" : null}
                   ${i == 0 && j == 6 ? "rounded-tr-2xl" : null} 
@@ -89,9 +89,9 @@ const Game: NextPage = () => {
             return row
           })}
         </div>
-        <div className="rounded-xl mx-4 shadow-lg bg-slate-700 p-4 px-9 my-auto" >
-          <div className="text-center flex-col justify-center">
             <h1 className="public-lg text-xl mb-5 whitespace-nowrap">
+        <div className="rounded-xl mx-4 shadow-lg bg-gray-600 p-4 px-9 my-auto" >
+          <div className="text-center flex-col justify-center text-gray-50">
               Its Your Turn!
             </h1>
             <div className="relative w-1/2 h-3/4 mx-auto">
@@ -113,6 +113,7 @@ const Game: NextPage = () => {
               </svg>
               <span className="absolute top-0 flex justify-center w-full h-full">
                 <div className="my-auto">{15 - timer.timePassed}</div>
+                <div className="my-auto public-lg">{15 - timer.timePassed}</div>
 
               </span>
             </div>
