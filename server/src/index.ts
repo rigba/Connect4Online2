@@ -2,12 +2,6 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import { ApolloServer } from "apollo-server-express";
-import { DataSource } from "typeorm";
-import { Game } from "./entities/Game";
-import { User } from "./entities/User";
-import { buildSchema } from "type-graphql";
-import { gameResolver } from "./resolvers/gameResolver";
-import { userResolver } from "./resolvers/userResolver";
 import { RedisPubSub } from "graphql-redis-subscriptions";
 import { createServer } from 'http';
 import {
@@ -17,26 +11,11 @@ import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
-
-export const AppDataSource = new DataSource({
-    type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "postgres",
-    password: "password",
-    database: "connect4",
-    synchronize: true,
-    logging: true,
-    entities: [Game, User],
-    subscribers: [],
-    migrations: [],
-})
+import { context } from "./types";
 
 const conn = async () => {
     const app = express();
     const httpServer = createServer(app);
-
-    AppDataSource.initialize()
 
     const whitelist = ["http://localhost:5000", "https://studio.apollographql.com"]
 
@@ -80,14 +59,7 @@ const conn = async () => {
         subscriber: new Redis(),
     });
 
-    const schema = await buildSchema({
-        resolvers: [gameResolver, userResolver],
-        pubSub,
-        validate: false,
-    })
-
     const server = new ApolloServer({
-        schema,
         plugins: [
             ApolloServerPluginLandingPageLocalDefault({ embed: true }),
             // Proper shutdown for the HTTP server.
@@ -103,7 +75,7 @@ const conn = async () => {
                 },
             },
         ],
-        context: ({ req, res }) => ({ req, res, redis }),
+        context: context,
     });
 
     const wsServer = new WebSocketServer({
