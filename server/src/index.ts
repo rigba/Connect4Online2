@@ -11,7 +11,11 @@ import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
-import { context } from "./types";
+import { createContext } from "./types";
+import { readFileSync } from 'node:fs'
+import { userResolver } from "./resolvers/userResolver";
+import { buildSchema } from "graphql";
+
 
 const conn = async () => {
     const app = express();
@@ -54,12 +58,13 @@ const conn = async () => {
 
     app.use(sessionMiddleWare)
 
-    const pubSub = new RedisPubSub({
-        publisher: new Redis(),
-        subscriber: new Redis(),
-    });
+    const typeDefs = readFileSync('./schema.graphql', 'utf8')
+
+    const schema = buildSchema(typeDefs)
 
     const server = new ApolloServer({
+        typeDefs,
+        resolvers: userResolver,
         plugins: [
             ApolloServerPluginLandingPageLocalDefault({ embed: true }),
             // Proper shutdown for the HTTP server.
@@ -75,7 +80,8 @@ const conn = async () => {
                 },
             },
         ],
-        context: context,
+        context: createContext
+    
     });
 
     const wsServer = new WebSocketServer({

@@ -7,18 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model game {
-  id        Int    @id(map: "PK_352a30652cd352f552fef73dec5") @default(autoincrement())
-  gameBoard Int[]
+model Game {
+  id        Int    @id() @default(autoincrement())
+  gameBoard String[]
   whoseMove Int
   winner    Int?
-  gameUUID  String @unique(map: "UQ_fa1dd6f1e17797f1028184237fe") @db.VarChar
-  usersId   Int?
-  user      user?  @relation(fields: [usersId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_bb6073cacff8e8c8eeb851ec536")
+  gameUUID  String @db.VarChar
+  created    User   @relation(fields: [createdId], references: [id], "created")
+  createdId Int
+  joined    User?   @relation(fields: [joinedID], references: [id], "joined")
+  joinedID  Int?
 }
 
-model user {
-  id       Int    @id(map: "PK_cace4a159ff9f2512dd42373760") @default(autoincrement())
-  username String @unique(map: "UQ_78a916df40e02a9deb1c4b75edb") @db.VarChar
-  game     game[]
+model User {
+  id       Int    @id() @default(autoincrement())
+  username String @unique() @db.VarChar
+  created Game[] @relation("created")
+  joined Game[] @relation("joined")
 }
