@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import Taskbar from "../../components/Taskbar";
 import { useRouter } from 'next/router'
 import { useEffect, useState } from "react";
-import { ClockIcon, PlusIcon } from "@heroicons/react/20/solid";
 
 enum gameStates {
   CREATED,
@@ -30,7 +29,7 @@ const Game: NextPage = () => {
   const router = useRouter()
   const { gameId } = router.query
   const [gameState, setGameState] = useState<gameStates>(gameStates.CREATED)
-  const [timer, setTimer] = useState({ timePassed: 0, stroke: "283" });
+  const [timer, setTimer] = useState({ timePassed: 0, stroke: "283", active: false  });
 
   const findDrop = (column): [number, number] => {
     for (let i = 0; i < gameBoard.length; i++) {
@@ -44,11 +43,12 @@ const Game: NextPage = () => {
   function startTimer() {
 
     let time = setInterval(() => {
-      setTimer({ ...timer, timePassed: timer.timePassed += 1 });
-      setTimer({ ...timer, stroke: ((15 - timer.timePassed) / 15 * 283).toFixed(0) });
-      console.log(timer);
+      if (timer.active) return 
+
+      setTimer({ stroke: ((15 - timer.timePassed + 1) / 15 * 283).toFixed(0), timePassed: timer.timePassed += 1, active: true });;
+      
       if (timer.timePassed >= 15) {
-        setTimer({ timePassed: 0, stroke: "283" });
+        setTimer({ timePassed: 0, stroke: "283", active: false });
         clearInterval(time)
         return;
       }
@@ -89,12 +89,11 @@ const Game: NextPage = () => {
             return row
           })}
         </div>
-            <h1 className="public-lg text-xl mb-5 whitespace-nowrap">
         <div className="rounded-xl mx-4 shadow-lg bg-gray-600 p-4 px-9 my-auto" >
           <div className="text-center flex-col justify-center text-gray-50">
               Its Your Turn!
             </h1>
-            <div className="relative w-1/2 h-3/4 mx-auto">
+            <div className="relative z-0 w-1/2 h-3/4 mx-auto mb-3" onClick={() => startTimer()}>
               <svg className="" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <g className="fill-transparent ">
                   <circle className="stroke-slate-800 timer-outline" cx="50" cy="50" r="45" />
@@ -112,7 +111,6 @@ const Game: NextPage = () => {
                 ></path>
               </svg>
               <span className="absolute top-0 flex justify-center w-full h-full">
-                <div className="my-auto">{15 - timer.timePassed}</div>
                 <div className="my-auto public-lg">{15 - timer.timePassed}</div>
 
               </span>
