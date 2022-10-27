@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import { ApolloServer } from "apollo-server-express";
-import { RedisPubSub } from "graphql-redis-subscriptions";
 import { createServer } from "http";
 import {
   ApolloServerPluginDrainHttpServer,
@@ -16,12 +15,13 @@ import { createContext } from "./types";
 import { readFileSync } from "node:fs";
 import { userResolver } from "./resolvers/userResolver";
 import { buildSchema } from "graphql";
-import { gameResolver } from "./resolvers/gameResolver";
+import gameResolver from "./resolvers/gameResolver";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+
+const app = express();
+const httpServer = createServer(app);
 
 const conn = async () => {
-  const app = express();
-  const httpServer = createServer(app);
-
   const whitelist = [
     "http://localhost:5000",
     "https://studio.apollographql.com",
@@ -64,16 +64,20 @@ const conn = async () => {
 
   const typeDefs = readFileSync("./schema.graphql", "utf8");
 
-  const schema = buildSchema(typeDefs);
-
-  const server = new ApolloServer({
+  const schema = makeExecutableSchema({
     typeDefs,
     resolvers: [userResolver, gameResolver],
+  });
+
+  const server = new ApolloServer({
+    schema,
     plugins: [
       ApolloServerPluginLandingPageLocalDefault({ embed: true }),
       // Proper shutdown for the HTTP server.
       ApolloServerPluginDrainHttpServer({ httpServer }),
+
       // Proper shutdown for the WebSocket server.
+
       {
         async serverWillStart() {
           return {
@@ -95,7 +99,7 @@ const conn = async () => {
     path: "/graphql",
   });
 
-  const serverCleanup = useServer({ schema }, wsServer);
+  const serverCleanup = useServer({ schema, context: createContext }, wsServer);
 
   await server.start();
 

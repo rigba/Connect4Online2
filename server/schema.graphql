@@ -11,6 +11,10 @@ type Mutation {
   movePiece(pieceLocation: [Int]!, gameId: Int!): Game
 }
 
+type Subscription {
+  gameInfo(gameId: Int!): Game
+}
+
 type Game {
   id: Int!  
   gameBoard: [String]!

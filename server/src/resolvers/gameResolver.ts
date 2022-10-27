@@ -1,8 +1,8 @@
 import { Game, Resolvers } from "resolvers-types";
-import { MyContext } from "src/types";
+import { MyContext, pubSub } from "../types";
 import { v4 as uuidv4 } from "uuid";
 
-export const gameResolver: Resolvers = {
+const gameResolver: Resolvers = {
   Mutation: {
     createGame: async (_, _args, context: MyContext): Promise<Game> => {
       const user = await context.prisma.user.findFirst({
@@ -28,10 +28,10 @@ export const gameResolver: Resolvers = {
             createdId: user.id,
           },
         });
-        console.log(game, "game");
       } catch (err) {
         throw new Error(err);
       }
+      pubSub.publish(`GAME_INFO_${game.id}`, { gameInfo: game });
 
       return game;
     },
@@ -67,7 +67,7 @@ export const gameResolver: Resolvers = {
       } catch (err) {
         throw new Error("Game could not save");
       }
-
+      pubSub.publish(`GAME_INFO_${game.id}`, { gameInfo: game });
       return game;
     },
     movePiece: async (_, args, context: MyContext): Promise<Game> => {
@@ -120,7 +120,7 @@ export const gameResolver: Resolvers = {
       } catch (err) {
         throw new Error("Game could not save");
       }
-
+      pubSub.publish(`GAME_INFO_${game.id}`, { gameInfo: game });
       return game;
     },
   },
@@ -135,6 +135,15 @@ export const gameResolver: Resolvers = {
       return await context.prisma.user.findFirst({
         where: { id: parent.joinedId },
       });
+    },
+  },
+  Subscription: {
+    gameInfo: {
+      subscribe: (_, args) => ({
+        [Symbol.asyncIterator]: () => {
+          return pubSub.asyncIterator([`GAME_INFO_${args.gameId}`]);
+        },
+      }),
     },
   },
 };
@@ -182,7 +191,6 @@ const isWinner = (
 
   for (let vectorGroup of twoDimensionalVectors as any as number[][][]) {
     let counter = 0;
-    console.log(vectorGroup);
     for (let vectors of vectorGroup) {
       if (
         proposedMove[0] + vectors[0] < 0 ||
@@ -220,3 +228,5 @@ const verifyMove = (gameBoard: string[], proposedMove: number[]): boolean => {
 
   return true;
 };
+
+export default gameResolver;

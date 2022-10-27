@@ -16,17 +16,16 @@ export type MyContext = {
   redis: RedisType;
   req: Request & { session: session.SessionData }; // HTTP request carrying the `Authorization` header
   res: Response;
-  pubsub: RedisPubSub;
 };
 
 export function createContext(req: any, res: any) {
   return {
     ...req,
     ...res,
-    pubSub,
     prisma,
   };
 }
+
 declare module "express-session" {
   interface SessionData {
     userId?: number;

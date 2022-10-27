@@ -63,6 +63,16 @@ export type Query = {
   me?: Maybe<User>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  gameInfo?: Maybe<Game>;
+};
+
+
+export type SubscriptionGameInfoArgs = {
+  gameId: Scalars['Int'];
+};
+
 export type User = {
   __typename?: 'User';
   game?: Maybe<Array<Maybe<Game>>>;
@@ -146,6 +156,7 @@ export type ResolversTypes = ResolversObject<{
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Subscription: ResolverTypeWrapper<{}>;
   User: ResolverTypeWrapper<User>;
 }>;
 
@@ -157,6 +168,7 @@ export type ResolversParentTypes = ResolversObject<{
   Mutation: {};
   Query: {};
   String: Scalars['String'];
+  Subscription: {};
   User: User;
 }>;
 
@@ -186,6 +198,10 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
 }>;
 
+export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
+  gameInfo?: SubscriptionResolver<Maybe<ResolversTypes['Game']>, "gameInfo", ParentType, ContextType, RequireFields<SubscriptionGameInfoArgs, 'gameId'>>;
+}>;
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   game?: Resolver<Maybe<Array<Maybe<ResolversTypes['Game']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -197,6 +213,7 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Game?: GameResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 }>;
 
