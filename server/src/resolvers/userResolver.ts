@@ -16,7 +16,7 @@ export const userResolver: Resolvers = {
             if (args.username.length < 3) {
                 throw new Error("Username too short")
             }
-            if (/[A-Za-z]/.test(args.username)) {
+            if (!/[A-z]/.test(args.username)) {
                 throw new Error("Username must only include alphabetic letters")
             }
             const user = await context.prisma.user.create({ data: { username: args.username } })
@@ -55,7 +55,7 @@ export const userResolver: Resolvers = {
             if (args.username.length < 3) {
                 throw new Error("Username too short")
             }
-            if (/[A-Za-z]/.test(args.username)) {
+            if (!/[A-z]/.test(args.username)) {
                 throw new Error("Username must only include alphabetic letters")
             }
             user.username = args.username

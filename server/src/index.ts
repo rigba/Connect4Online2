@@ -6,7 +6,8 @@ import { RedisPubSub } from "graphql-redis-subscriptions";
 import { createServer } from 'http';
 import {
     ApolloServerPluginDrainHttpServer,
-    ApolloServerPluginLandingPageLocalDefault,} from "apollo-server-core";
+    ApolloServerPluginLandingPageLocalDefault,
+} from "apollo-server-core";
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 import connectRedis from "connect-redis";
@@ -15,6 +16,7 @@ import { createContext } from "./types";
 import { readFileSync } from 'node:fs'
 import { userResolver } from "./resolvers/userResolver";
 import { buildSchema } from "graphql";
+import { gameResolver } from "./resolvers/gameResolver";
 
 
 const conn = async () => {
@@ -64,7 +66,7 @@ const conn = async () => {
 
     const server = new ApolloServer({
         typeDefs,
-        resolvers: userResolver,
+        resolvers: [userResolver, gameResolver],
         plugins: [
             ApolloServerPluginLandingPageLocalDefault({ embed: true }),
             // Proper shutdown for the HTTP server.
@@ -81,7 +83,7 @@ const conn = async () => {
             },
         ],
         context: createContext
-    
+
     });
 
     const wsServer = new WebSocketServer({

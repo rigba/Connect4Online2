@@ -1,4 +1,4 @@
-import { Game, Maybe, Resolvers } from "resolvers-types";
+import { Game, Resolvers } from "resolvers-types";
 import { MyContext } from "src/types";
 import { v4 as uuidv4 } from "uuid";
 
@@ -6,14 +6,11 @@ import { v4 as uuidv4 } from "uuid";
 export const gameResolver: Resolvers = {
   Mutation: {
     createGame: async (_, _args, context: MyContext): Promise<Game> => {
-
       const user = await context.prisma.user.findFirst({ where: { id: context.req.session?.userId } })
       if (!user) {
         throw new Error("Error creating user")
       }
-      let game = null
-
-
+      let game
       try {
         game = await context.prisma.game.create({
           data: {
@@ -29,14 +26,13 @@ export const gameResolver: Resolvers = {
             gameUUID: uuidv4(),
             whoseMove: user.id,
             createdId: user.id
-
-          }
-        })
+          }})
+          console.log(game, "game")
       } catch (err) {
         throw new Error(err)
       }
 
-      return game
+        return game
     },
 
     joinGame: async (_, args, context: MyContext): Promise<Game> => {
