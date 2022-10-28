@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 const gameResolver: Resolvers = {
   Mutation: {
     createGame: async (_, _args, context: MyContext): Promise<Game> => {
-      const user = await context.prisma.user.findFirst({
+      const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
       if (!user) {
@@ -37,14 +37,14 @@ const gameResolver: Resolvers = {
     },
 
     joinGame: async (_, args, context: MyContext): Promise<Game> => {
-      const game = await context.prisma.game.findFirst({
+      const game = await context.prisma.game.findUnique({
         where: { id: args.gameId },
       });
       if (!game) {
         throw new Error("Game does not exist!");
       }
 
-      const user = await context.prisma.user.findFirst({
+      const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
       if (!user) {
@@ -71,14 +71,14 @@ const gameResolver: Resolvers = {
       return game;
     },
     movePiece: async (_, args, context: MyContext): Promise<Game> => {
-      const game = await context.prisma.game.findFirst({
+      const game = await context.prisma.game.findUnique({
         where: { id: args.gameId },
       });
       if (!game) {
         throw new Error("Game does not exist!");
       }
 
-      const user = await context.prisma.user.findFirst({
+      const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
       if (!user) {
@@ -126,13 +126,13 @@ const gameResolver: Resolvers = {
   },
   Game: {
     async created(parent, _, context: MyContext) {
-      return await context.prisma.user.findFirst({
+      return await context.prisma.user.findUnique({
         where: { id: parent.createdId },
       });
     },
     async joined(parent, _, context: MyContext) {
       if (!parent.joinedId) return null;
-      return await context.prisma.user.findFirst({
+      return await context.prisma.user.findUnique({
         where: { id: parent.joinedId },
       });
     },

@@ -1,10 +1,10 @@
-import { MyContext } from 'src/types'
+import { MyContext, pubSub } from 'src/types'
 import { Resolvers, User } from '../../resolvers-types'
 
 export const userResolver: Resolvers = {
     Query: {
         me: async (_, _args, context: MyContext): Promise<User> => {
-            const user = await context.prisma.user.findFirst({ where: { id: context.req.session?.userId } })
+            const user = await context.prisma.user.findUnique({ where: { id: context.req.session?.userId } })
             if (!user) {
                 throw new Error("User does not exist")
             }
@@ -48,7 +48,7 @@ export const userResolver: Resolvers = {
             return true
         },
         changeUsername: async (_, args, context: MyContext): Promise<User> => {
-            const user = await context.prisma.user.findFirst({ where: { id: context.req.session?.userId } })
+            const user = await context.prisma.user.findUnique({ where: { id: context.req.session?.userId } })
             if (!user) {
                 throw new Error("User does not exist")
             }
