@@ -1,0 +1,34 @@
+type Query {
+  me: User
+}
+
+type Mutation {
+  createUser(username: String!): User
+  changeUsername(username: String!): User
+  deleteUser: Boolean
+  createGame: Game
+  joinGame(gameId: Int!): Game
+  movePiece(pieceLocation: [Int]!, gameId: Int!): Game
+}
+
+type Subscription {
+  gameInfo(gameId: Int!): Game
+}
+
+type Game {
+  id: Int!  
+  gameBoard: [String]!
+  whoseMove: Int!
+  winner: Int
+  gameUUID: String!
+  joined: User
+  created: User
+  createdId: Int!
+  joinedId: Int
+}
+
+type User {
+  id: Int!
+  username: String!
+  game: [Game]
+}
