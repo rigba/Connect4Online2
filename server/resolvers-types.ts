@@ -49,7 +49,7 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationJoinGameArgs = {
-  gameId: Scalars['Int'];
+  gameId: Scalars['String'];
 };
 
 

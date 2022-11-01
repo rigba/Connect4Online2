@@ -38,8 +38,8 @@ const gameResolver: Resolvers = {
     },
 
     joinGame: async (_, args, context: MyContext): Promise<Game> => {
-      const game = await context.prisma.game.findUnique({
-        where: { id: args.gameId },
+      const game = await context.prisma.game.findFirst({
+        where: { gameUUID: String(args.gameId) },
       });
       if (!game) {
         throw new Error("Game does not exist!");
@@ -62,7 +62,7 @@ const gameResolver: Resolvers = {
 
       try {
         await context.prisma.game.update({
-          where: { id: args.gameId },
+          where: { id: game.id },
           data: game,
         });
       } catch (err) {

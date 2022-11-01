@@ -7,7 +7,7 @@ type Mutation {
   changeUsername(username: String!): User
   deleteUser: Boolean
   createGame: Game
-  joinGame(gameId: Int!): Game
+  joinGame(gameId: String!): Game
   movePiece(pieceLocation: [Int]!, gameId: Int!): Game
 }
 
