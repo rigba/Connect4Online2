@@ -22,7 +22,6 @@ const app = express();
 const httpServer = createServer(app);
 
 const conn = async () => {
-
   const corsOptions: cors.CorsOptions = {
     origin: "http://localhost:5000",
     credentials: true
@@ -43,13 +42,14 @@ const conn = async () => {
         disableTouch: true,
       }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
-        sameSite: "lax", // csrf
-        secure: false, // cookie only works in https
+        sameSite: "lax",
+        secure: false,
       },
       saveUninitialized: false,
       resave: false,
+      
   });
 
   app.use(sessionMiddleWare);

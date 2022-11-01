@@ -1,7 +1,6 @@
 import { Game, Resolvers } from "resolvers-types";
 import { MyContext, pubSub } from "../types";
 import { v4 as uuidv4 } from "uuid";
-import { userInfo } from "node:os";
 
 const gameResolver: Resolvers = {
   Mutation: {
@@ -38,11 +37,13 @@ const gameResolver: Resolvers = {
     },
 
     joinGame: async (_, args, context: MyContext): Promise<Game> => {
-      const game = await context.prisma.game.findFirst({
-        where: { gameUUID: String(args.gameId) },
-      });
+      const game = await context.prisma.game
+        .findUnique({
+          where: { gameUUID: String(args.gameId) },
+        })
+        .catch();
       if (!game) {
-        throw new Error("Game does not exist!");
+        throw new Error("Game does not exist");
       }
 
       const user = await context.prisma.user.findUnique({
@@ -141,36 +142,47 @@ const gameResolver: Resolvers = {
   Subscription: {
     gameInfo: {
       subscribe: (_, args, { ctx, prisma }) => ({
-        [Symbol.asyncIterator]: () => {
-          const verify = async (id: number) => {
-            await prisma.user
+        [Symbol.asyncIterator]() {
+          const verify = async () => {
+            const user = await prisma.user
               .findUnique({
-                where: { id: id },
+                where: { id: ctx.extra.request.session?.userId },
               })
               .catch(() => {
-                return pubSub.asyncIterator([]);
+                args.gameUUID = "";
+                return;
               });
+            console.log(user);
+            if (!user) {
+              args.gameUUID = "";
+              return;
+            }
+
             const game = await prisma.game
               .findUnique({
                 where: {
-                  id: args.gameId,
+                  gameUUID: args.gameUUID,
                 },
               })
               .catch(() => {
-                return pubSub.asyncIterator([]);
+                args.gameUUID = "";
+                return;
               });
+            if (!game) {
+              args.gameUUID = "";
+              return;
+            }
             if (
               game.joinedId !== ctx.extra.request.session?.userId ||
               game.createdId !== ctx.extra.request.session?.userId
             ) {
-              return pubSub.asyncIterator([]);
+              args.gameUUID = "";
             }
-            return
+            return;
           };
+          verify();
 
-          verify(ctx.extra.request.session.userId);
-
-          return pubSub.asyncIterator([`GAME_INFO_${args.gameId}`]);
+          return pubSub.asyncIterator([`GAME_INFO_${args.gameUUID}`]);
         },
       }),
     },

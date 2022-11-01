@@ -12,7 +12,7 @@ model Game {
   gameBoard String[]
   whoseMove Int
   winner    Int?
-  gameUUID  String @db.VarChar
+  gameUUID  String @db.VarChar @unique
   created    User   @relation(fields: [createdId], references: [id], "created")
   createdId Int
   joined    User?   @relation(fields: [joinedID], references: [id], "joined")
