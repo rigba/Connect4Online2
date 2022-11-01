@@ -1,0 +1,6 @@
+mutation ChangeUsername($username: String!) {
+  changeUsername(username: $username) {
+    id
+    username
+  }
+}

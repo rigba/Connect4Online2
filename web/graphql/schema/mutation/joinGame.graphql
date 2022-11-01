@@ -1,0 +1,21 @@
+mutation JoinGame($gameId: String!) {
+  joinGame(gameId: $gameId) {
+    id
+    gameBoard
+    whoseMove
+    winner
+    gameUUID
+    joined {
+      id
+      username
+    }
+    created {
+      id
+      username
+    }
+    createdId
+    joinedId
+  }
+}
+
+

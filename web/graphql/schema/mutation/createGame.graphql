@@ -1,0 +1,20 @@
+mutation CreateGame {
+  createGame {
+    id
+    gameBoard
+    whoseMove
+    winner
+    gameUUID
+    joined {
+      id
+      username
+    }
+    created {
+      id
+      username
+    }
+    createdId
+    joinedId
+  }
+}
+

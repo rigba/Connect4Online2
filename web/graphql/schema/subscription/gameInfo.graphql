@@ -1,0 +1,19 @@
+subscription GameInfo($gameId: Int!) {
+  gameInfo(gameId: $gameId) {
+    id
+    gameBoard
+    whoseMove
+    winner
+    gameUUID
+    joined {
+      username
+      id
+    }
+    created {
+      username
+      id
+    }
+    createdId
+    joinedId
+  }
+}

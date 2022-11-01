@@ -1,0 +1,20 @@
+mutation MovePiece($pieceLocation: [Int]!, $gameId: Int!) {
+  movePiece(pieceLocation: $pieceLocation, gameId: $gameId) {
+    id
+    gameBoard
+    whoseMove
+    winner
+    gameUUID
+    joined {
+      id
+      username
+    }
+    created {
+      id
+      username
+    }
+    createdId
+    joinedId
+  }
+}
+
