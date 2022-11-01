@@ -12,7 +12,7 @@ type Mutation {
 }
 
 type Subscription {
-  gameInfo(gameId: Int!): Game
+  gameInfo(gameUUID: String!): Game
 }
 
 type Game {

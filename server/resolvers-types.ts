@@ -70,7 +70,7 @@ export type Subscription = {
 
 
 export type SubscriptionGameInfoArgs = {
-  gameId: Scalars['Int'];
+  gameUUID: Scalars['String'];
 };
 
 export type User = {
@@ -199,7 +199,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
-  gameInfo?: SubscriptionResolver<Maybe<ResolversTypes['Game']>, "gameInfo", ParentType, ContextType, RequireFields<SubscriptionGameInfoArgs, 'gameId'>>;
+  gameInfo?: SubscriptionResolver<Maybe<ResolversTypes['Game']>, "gameInfo", ParentType, ContextType, RequireFields<SubscriptionGameInfoArgs, 'gameUUID'>>;
 }>;
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
