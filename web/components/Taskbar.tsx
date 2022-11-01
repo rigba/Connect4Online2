@@ -1,3 +1,4 @@
+import { ApolloQueryResult, useQuery } from "@apollo/client";
 import { Menu, Transition } from "@headlessui/react";
 import {
   UserIcon,
@@ -8,36 +9,38 @@ import {
   PencilIcon,
 } from "@heroicons/react/20/solid";
 import { useEffect, useState, Fragment } from "react";
-
-export const myUser = { id: 1, username: "bob" };
+import { MeDocument, MeQuery, User } from "../graphql/generated/graphql";
 
 const Taskbar = ({ passUser }: { passUser? }) => {
-  const [user, setUser] = useState<any>();
+  const meRes = useQuery(MeDocument, { ssr: true });
 
   useEffect(() => {
-    setUser(myUser);
-    if (!passUser) {
-      return;
-    }
-    passUser(user);
-  }, [user]);
+    const getMe = async () => {
+      try {
+        let res = await meRes.refetch();
+      } catch {}
+    };
+    getMe();
+    if (!passUser) return;
+    passUser(meRes);
+  }, [meRes.data]);
 
   return (
     <div className="flex rounded-xl mx-auto max-w-4xl shadow-lg my-5 bg-gray-700 p-4 px-4">
-      <text className="text-2xl md:text-5xl public-xl text-slate-100 mr-auto my-auto shadow-md">
-        <div className="bg-blue-700 grid grid-flow-col gap-3 py-1 px-4 rounded-md">
+      <div className="text-3xl md:text-5xl public-xl mr-auto my-auto">
+        <div className="bg-blue-700 flex flex-row gap-3 py-2 md:py-1 px-4 rounded-md shadow-md">
           <h1 className="text-red-500 my-auto">C</h1>
           <h1 className="text-yellow-500 m-auto">F</h1>
           <h1 className="text-blue-900 m-auto">O</h1>
           <svg
-            className="h-full pt-2 pb-1 mx-auto m-auto"
+            className="h-full w-6 md:w-10 pt-2 pb-1 mx-auto m-auto"
             viewBox="0 0 100 100"
             xmlns="http://www.w3.org/2000/svg"
           >
             <circle className="fill-red-500" cx="50" cy="50" r="45" />
           </svg>
         </div>
-      </text>
+      </div>
 
       <button className="shadow-md group inline-flex items-center rounded-md bg-red-500 text-base font-medium text-white mr-2 h-full px-3 py-3 my-auto">
         <PlusIcon
@@ -67,20 +70,14 @@ const Taskbar = ({ passUser }: { passUser? }) => {
             leaveTo="opacity-0 translate-y-1"
           >
             <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-              {user === undefined ? (
+              {!meRes.data?.me ? (
                 <>
                   <div className="px-1 py-1 ">
                     <Menu.Item>
                       {({}) => (
-                        <button
-                          className={`text-gray-900 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                        >
-                          <UserIcon
-                            className="mr-2 h-5 w-5"
-                            aria-hidden="true"
-                          />
-                          Edit
-                        </button>
+                        <div className="text-gray-600 p-4 public-lg">
+                          You aren't logged in
+                        </div>
                       )}
                     </Menu.Item>
                   </div>
@@ -97,7 +94,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
                             className="mr-2 h-5 w-5"
                             aria-hidden="true"
                           />
-                          {`Welcome back ${user.username.toUpperCase()}! `}
+                          {`Welcome back ${meRes.data.me.username.toUpperCase()}! `}
                         </button>
                       )}
                     </Menu.Item>
