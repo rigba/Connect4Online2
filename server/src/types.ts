@@ -9,7 +9,7 @@ export const pubSub = new RedisPubSub({
   subscriber: new Redis(),
 });
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 export type MyContext = {
   prisma: PrismaClient;

@@ -11,32 +11,25 @@ import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import connectRedis from "connect-redis";
 import Redis from "ioredis";
-import { createContext } from "./types";
+import { createContext, MyContext, prisma } from "./types";
 import { readFileSync } from "node:fs";
-import { userResolver } from "./resolvers/userResolver";
-import { buildSchema } from "graphql";
+import { userResolver } from "./resolvers/userResolver"; 
 import gameResolver from "./resolvers/gameResolver";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 
 const app = express();
 const httpServer = createServer(app);
 
 const conn = async () => {
-  const whitelist = [
-    "http://localhost:5000",
-    "https://studio.apollographql.com",
-  ];
+
+  const corsOptions: cors.CorsOptions = {
+    origin: "http://localhost:5000",
+    credentials: true
+  }
 
   app.use(
-    cors({
-      origin: function (origin, callback) {
-        if (whitelist.indexOf(origin as string) !== -1 || !origin) {
-          callback(null, true);
-        } else {
-          callback(new Error(origin + " not allowed by CORS"));
-        }
-      },
-    })
+    cors(corsOptions)  
   );
 
   const RedisStore = connectRedis(session);
@@ -46,18 +39,17 @@ const conn = async () => {
     name: "connect4",
     secret: "mySecret",
     store: new RedisStore({
-      client: redis,
-      disableTouch: true,
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
-      path: "/",
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false,
-    },
-    resave: false,
-    saveUninitialized: true,
+        client: redis,
+        disableTouch: true,
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+        httpOnly: true,
+        sameSite: "lax", // csrf
+        secure: false, // cookie only works in https
+      },
+      saveUninitialized: false,
+      resave: false,
   });
 
   app.use(sessionMiddleWare);
@@ -72,7 +64,7 @@ const conn = async () => {
   const server = new ApolloServer({
     schema,
     plugins: [
-      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
+      ApolloServerPluginLandingPageLocalDefault({ includeCookies: true, embed: true, }),
       // Proper shutdown for the HTTP server.
       ApolloServerPluginDrainHttpServer({ httpServer }),
 
@@ -99,14 +91,45 @@ const conn = async () => {
     path: "/graphql",
   });
 
-  const serverCleanup = useServer({ schema, context: createContext }, wsServer);
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: (ctx, args, msgs) => {
+        return {
+          ctx,
+          args,
+          msgs,
+          prisma, 
+        };
+      },
+      onConnect(ctx) {
+        
+        const promise:
+          | Promise<Record<string, unknown> | boolean | void>
+          | Record<string, unknown>
+          | boolean
+          | void = new Promise((resolve, _reject) => {
+          const req = ctx.extra.request as MyContext["req"];
 
-  await server.start();
+          sessionMiddleWare(req, {} as any, () => {
+            const userId = req.session?.userId;
+            return resolve({ userId });
+          });
+        });
+
+        return promise;
+      },
+    },
+
+    wsServer
+  );
+    await server.start();
 
   server.applyMiddleware({
     app,
-    cors: false,
+    cors: corsOptions,
   });
+
 
   httpServer.listen(5000, () => {
     console.log(`server started...`);

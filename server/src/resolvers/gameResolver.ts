@@ -1,6 +1,7 @@
 import { Game, Resolvers } from "resolvers-types";
 import { MyContext, pubSub } from "../types";
 import { v4 as uuidv4 } from "uuid";
+import { userInfo } from "node:os";
 
 const gameResolver: Resolvers = {
   Mutation: {
@@ -139,8 +140,36 @@ const gameResolver: Resolvers = {
   },
   Subscription: {
     gameInfo: {
-      subscribe: (_, args) => ({
+      subscribe: (_, args, { ctx, prisma }) => ({
         [Symbol.asyncIterator]: () => {
+          const verify = async (id: number) => {
+            await prisma.user
+              .findUnique({
+                where: { id: id },
+              })
+              .catch(() => {
+                return pubSub.asyncIterator([]);
+              });
+            const game = await prisma.game
+              .findUnique({
+                where: {
+                  id: args.gameId,
+                },
+              })
+              .catch(() => {
+                return pubSub.asyncIterator([]);
+              });
+            if (
+              game.joinedId !== ctx.extra.request.session?.userId ||
+              game.createdId !== ctx.extra.request.session?.userId
+            ) {
+              return pubSub.asyncIterator([]);
+            }
+            return
+          };
+
+          verify(ctx.extra.request.session.userId);
+
           return pubSub.asyncIterator([`GAME_INFO_${args.gameId}`]);
         },
       }),
