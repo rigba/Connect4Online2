@@ -1,0 +1,11 @@
+query FetchGame($gameId: String!) {
+  fetchGame(gameId: $gameId) {
+    id
+    gameBoard
+    whoseMove
+    winner
+    gameUUID
+    createdId
+    joinedID
+  }
+}

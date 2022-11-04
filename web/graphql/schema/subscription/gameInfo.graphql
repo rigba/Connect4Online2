@@ -1,19 +1,17 @@
-subscription GameInfo($gameId: Int!) {
-  gameInfo(gameId: $gameId) {
+subscription gameInfo($gameUUID: String!) {
+  gameInfo(gameUUID: $gameUUID) {
     id
     gameBoard
     whoseMove
     winner
-    gameUUID
     joined {
-      username
       id
     }
     created {
-      username
       id
     }
+    gameUUID
     createdId
-    joinedId
+    joinedID
   }
 }

@@ -14,7 +14,7 @@ mutation JoinGame($gameId: String!) {
       username
     }
     createdId
-    joinedId
+    joinedID
   }
 }
 
