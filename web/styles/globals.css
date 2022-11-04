@@ -21,22 +21,6 @@ a {
   box-sizing: border-box;
 }
 
-.public-sm {
-  font-weight: 300;
-}
-
-.public-rg {
-  font-weight: 400;
-}
-
-.public-lg {
-  font-weight: 700;
-}
-
-.public-xl {
-  font-weight: 800;
-}
-
 .gameBoard {
   display: grid;
   grid-template-columns: repeat(7, 7fr);
@@ -81,7 +65,7 @@ a {
 
 @keyframes fadeInOut {
   0% {
-    opacity: 0.2;
+    opacity: 0.1;
   }
 
   50% {
@@ -89,7 +73,7 @@ a {
   }
 
   100% {
-    opacity: 0.2;
+    opacity: 0.1;
   }
 }
 
