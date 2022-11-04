@@ -23,7 +23,7 @@ const httpServer = createServer(app);
 
 const conn = async () => {
   const corsOptions: cors.CorsOptions = {
-    origin: "http://localhost:5000",
+    origin: "http://localhost:3000",
     credentials: true
   }
 
@@ -84,10 +84,7 @@ const conn = async () => {
   });
 
   const wsServer = new WebSocketServer({
-    // This is the `httpServer` we created in a previous step.
     server: httpServer,
-    // Pass a different path here if app.use
-    // serves expressMiddleware at a different path
     path: "/graphql",
   });
 

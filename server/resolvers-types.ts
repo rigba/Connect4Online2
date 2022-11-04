@@ -22,7 +22,7 @@ export type Game = {
   gameUUID: Scalars['String'];
   id: Scalars['Int'];
   joined?: Maybe<User>;
-  joinedId?: Maybe<Scalars['Int']>;
+  joinedID?: Maybe<Scalars['Int']>;
   whoseMove: Scalars['Int'];
   winner?: Maybe<Scalars['Int']>;
 };
@@ -60,7 +60,13 @@ export type MutationMovePieceArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  fetchGame?: Maybe<Game>;
   me?: Maybe<User>;
+};
+
+
+export type QueryFetchGameArgs = {
+  gameId: Scalars['String'];
 };
 
 export type Subscription = {
@@ -179,7 +185,7 @@ export type GameResolvers<ContextType = any, ParentType extends ResolversParentT
   gameUUID?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   joined?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  joinedId?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  joinedID?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   whoseMove?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   winner?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -195,6 +201,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  fetchGame?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType, RequireFields<QueryFetchGameArgs, 'gameId'>>;
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
 }>;
 

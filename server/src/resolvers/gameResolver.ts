@@ -1,6 +1,7 @@
 import { Game, Resolvers } from "resolvers-types";
 import { MyContext, pubSub } from "../types";
 import { v4 as uuidv4 } from "uuid";
+import { PrismaClient } from "@prisma/client";
 
 const gameResolver: Resolvers = {
   Mutation: {
@@ -9,7 +10,7 @@ const gameResolver: Resolvers = {
         where: { id: context.req.session?.userId },
       });
       if (!user) {
-        throw new Error("Error creating user");
+        throw new Error("Auth error");
       }
       let game;
       try {
@@ -31,14 +32,14 @@ const gameResolver: Resolvers = {
       } catch (err) {
         throw new Error(err);
       }
-      pubSub.publish(`GAME_INFO_${game.id}`, { gameInfo: game });
+      pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
 
       return game;
     },
 
     joinGame: async (_, args, context: MyContext): Promise<Game> => {
       const game = await context.prisma.game
-        .findUnique({
+        .findUniqueOrThrow({
           where: { gameUUID: String(args.gameId) },
         })
         .catch();
@@ -60,6 +61,7 @@ const gameResolver: Resolvers = {
       if (game.joinedID) {
         throw new Error("Game is full");
       }
+      game.joinedID = (context.req.session?.userId) as number
 
       try {
         await context.prisma.game.update({
@@ -69,7 +71,7 @@ const gameResolver: Resolvers = {
       } catch (err) {
         throw new Error("Game could not save");
       }
-      pubSub.publish(`GAME_INFO_${game.id}`, { gameInfo: game });
+      pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
       return game;
     },
     movePiece: async (_, args, context: MyContext): Promise<Game> => {
@@ -85,10 +87,6 @@ const gameResolver: Resolvers = {
       });
       if (!user) {
         throw new Error("Error creating user");
-      }
-
-      if (game.joinedID || game.createdId === user.id) {
-        throw new Error("Hacking");
       }
 
       if (!verifyMove(game.gameBoard, args.pieceLocation as number[])) {
@@ -114,16 +112,44 @@ const gameResolver: Resolvers = {
 
       game.gameBoard[args.pieceLocation[0] as number] = row;
 
+      game.whoseMove =
+        game.createdId === context.req.session.userId
+          ? (game.joinedID as number)
+          : game.createdId;
+      console.log(game.whoseMove)
+
       try {
         await context.prisma.game.update({
           where: { id: args.gameId },
           data: game,
         });
       } catch (err) {
-        throw new Error("Game could not save");
+        console.log(err)
+        throw new Error(err);
       }
-      pubSub.publish(`GAME_INFO_${game.id}`, { gameInfo: game });
+      pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
       return game;
+    },
+  },
+  Query: {
+    fetchGame: async (_, args, context: MyContext): Promise<Game> => {
+      const user = await context.prisma.user.findUnique({
+        where: { id: context.req.session?.userId },
+      });
+      if (!user) {
+        throw new Error("Error creating user");
+      }
+
+      const game = await context.prisma.game.findUnique({
+        where: { gameUUID: args.gameId },
+      });
+      if (!game) {
+        throw new Error("Game does not exist!");
+      }
+      console.log(game)
+      pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
+      return game
+      
     },
   },
   Game: {
@@ -133,9 +159,9 @@ const gameResolver: Resolvers = {
       });
     },
     async joined(parent, _, context: MyContext) {
-      if (!parent.joinedId) return null;
+      if (!parent.joinedID) return null;
       return await context.prisma.user.findUnique({
-        where: { id: parent.joinedId },
+        where: { id: parent.joinedID },
       });
     },
   },
@@ -143,8 +169,9 @@ const gameResolver: Resolvers = {
     gameInfo: {
       subscribe: (_, args, { ctx, prisma }) => ({
         [Symbol.asyncIterator]() {
+          console.log("trigeered")
           const verify = async () => {
-            const user = await prisma.user
+            const user = await (prisma as PrismaClient).user
               .findUnique({
                 where: { id: ctx.extra.request.session?.userId },
               })
@@ -178,9 +205,10 @@ const gameResolver: Resolvers = {
             ) {
               args.gameUUID = "";
             }
+            args.gameUUID = game.id
             return;
           };
-          verify();
+          //verify();
 
           return pubSub.asyncIterator([`GAME_INFO_${args.gameUUID}`]);
         },
@@ -229,18 +257,19 @@ const isWinner = (
     }
   ); // [[[0, 1], [0, 2] [0, 3], [...], [...], [...]], [...], [...]]
   twoDimensionalVectors = twoDimensionalVectors.flat(1); // un-nests array [[0, 1], [...], [...], ...]
-
   for (let vectorGroup of twoDimensionalVectors as any as number[][][]) {
     let counter = 0;
     for (let vectors of vectorGroup) {
       if (
         proposedMove[0] + vectors[0] < 0 ||
         proposedMove[1] + vectors[1] < 0 ||
-        proposedMove[0] + vectors[0] > gameBoard.length ||
-        proposedMove[1] + vectors[1] > gameBoard[0].length
+        proposedMove[0] + vectors[0] >= gameBoard.length ||
+        proposedMove[1] + vectors[1] >= gameBoard[0].length
       ) {
         continue; // out of bounds
       }
+      console.log(proposedMove[0],  vectors[0],
+        proposedMove[1],  vectors[1])
       if (
         gameBoard[proposedMove[0] + vectors[0]].charAt(
           proposedMove[1] + vectors[1]
@@ -248,6 +277,7 @@ const isWinner = (
       ) {
         counter++;
       }
+  
     }
     if (counter === 3) {
       return true;
@@ -260,8 +290,10 @@ const verifyMove = (gameBoard: string[], proposedMove: number[]): boolean => {
   if (gameBoard[proposedMove[0]].charAt(proposedMove[1]) !== "0") {
     throw new Error(`${[proposedMove[0]][proposedMove[1]]} is taken`);
   }
-  if (gameBoard[proposedMove[0] + 1].charAt(proposedMove[1]) !== "0") {
-    throw new Error(`${[proposedMove[0]][proposedMove[1]]} is a floating move`);
+  if (gameBoard.length <= proposedMove[0]){
+    if (gameBoard[proposedMove[0] + 1].charAt(proposedMove[1]) !== "0") {
+      throw new Error(`${[proposedMove[0]][proposedMove[1]]} is a floating move`);
+    }
   }
   if (proposedMove[0] > 6 || proposedMove[1] > 7) {
     throw new Error(`${[proposedMove[0]][proposedMove[1]]} is out of bounds`);

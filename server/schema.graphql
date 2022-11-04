@@ -1,5 +1,6 @@
 type Query {
   me: User
+  fetchGame(gameId: String!): Game
 }
 
 type Mutation {
@@ -24,7 +25,7 @@ type Game {
   joined: User
   created: User
   createdId: Int!
-  joinedId: Int
+  joinedID: Int
 }
 
 type User {
