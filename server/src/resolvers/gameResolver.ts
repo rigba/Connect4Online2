@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 const gameResolver: Resolvers = {
   Mutation: {
     createGame: async (_, _args, context: MyContext): Promise<Game> => {
+      if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
@@ -47,6 +48,7 @@ const gameResolver: Resolvers = {
         throw new Error("Game does not exist");
       }
 
+      if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
