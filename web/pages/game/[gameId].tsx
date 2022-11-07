@@ -128,40 +128,18 @@ const Game: NextPage = (xd) => {
             return row;
           })}
         </div>
-        <div className="rounded-xl mx-4 shadow-lg bg-gray-600 p-4 px-9 my-auto" >
-          <div className="text-center flex-col justify-center text-gray-50">
-              Its Your Turn!
-            </h1>
-            <div className="relative z-0 w-1/2 h-3/4 mx-auto mb-3" onClick={() => startTimer()}>
-              <svg className="" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <g className="fill-transparent ">
-                  <circle className="stroke-slate-800 timer-outline" cx="50" cy="50" r="45" />
-                </g>
-                <path
-                  id="base-timer-path-remaining"
-                  style={{ strokeDasharray: `${timer.stroke} 283` }}
-                  className="stroke-green-500 timer-outline fill-transparent transform rotate-90 timer-ticker"
-                  d="
-          M 50, 50
-          m -45, 0
-          a 45,45 0 1,0 90,0
-          a 45,45 0 1,0 -90,0
-        "
-                ></path>
-              </svg>
-              <span className="absolute top-0 flex justify-center w-full h-full">
-                <div className="my-auto public-lg">{15 - timer.timePassed}</div>
-
-              </span>
-            </div>
-
-          </div>
+        <div className="rounded-xl mx-2 shadow-lg bg-gray-600 p-4 my-auto">
+          <GameStateUI
+            game={gameInfo}
+            user={userRes}
+            timer={timer}
+            setTimer={setTimer}
+            gameId={gameId as string}
+          />
         </div>
       </div>
-
     </div>
   );
 };
 
 export default Game;
-
