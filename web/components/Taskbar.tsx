@@ -27,7 +27,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
 
   return (
     <div className="flex rounded-xl mx-auto max-w-4xl shadow-lg my-5 bg-gray-700 p-4 px-4">
-      <div className="text-3xl md:text-5xl public-xl mr-auto my-auto">
+      <button className="text-3xl md:text-5xl font-public-xl mr-auto my-auto">
         <div className="bg-blue-700 flex flex-row gap-3 py-2 md:py-1 px-4 rounded-md shadow-md">
           <h1 className="text-red-500 my-auto">C</h1>
           <h1 className="text-yellow-500 m-auto">F</h1>
@@ -40,7 +40,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
             <circle className="fill-red-500" cx="50" cy="50" r="45" />
           </svg>
         </div>
-      </div>
+      </button>
 
       <button className="shadow-md group inline-flex items-center rounded-md bg-red-500 text-base font-medium text-white mr-2 h-full px-3 py-3 my-auto">
         <PlusIcon
@@ -75,7 +75,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
                   <div className="px-1 py-1 ">
                     <Menu.Item>
                       {({}) => (
-                        <div className="text-gray-600 p-4 public-lg">
+                        <div className="text-gray-600 p-4 font-public-lg">
                           You aren't logged in
                         </div>
                       )}
