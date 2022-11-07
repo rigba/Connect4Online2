@@ -4,8 +4,6 @@ import { QueryResult, useMutation, useQuery, useSubscription } from "@apollo/cli
 import { CreateGameDocument, CreateUserDocument, MeQuery } from "../graphql/generated/graphql";
 import { useRouter } from 'next/router'
 import { useEffect, useState } from "react";
-import Cookies from 'universal-cookie';
-
 
 const Home: NextPage = () => {
   const router = useRouter()
@@ -49,7 +47,7 @@ const Home: NextPage = () => {
     try {
       let game = await createGame()
       if(!game.data) return
-      router.push(`/game/${game.data.createGame.gameUUID}`)
+      router.replace(`/game/${game.data.createGame.gameUUID}`)
 
     } catch{}
   };
