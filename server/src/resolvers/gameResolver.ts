@@ -133,23 +133,15 @@ const gameResolver: Resolvers = {
   },
   Query: {
     fetchGame: async (_, args, context: MyContext): Promise<Game> => {
-      const user = await context.prisma.user.findUnique({
-        where: { id: context.req.session?.userId },
-      });
-      if (!user) {
-        throw new Error("Error creating user");
-      }
-
       const game = await context.prisma.game.findUnique({
         where: { gameUUID: args.gameId },
       });
       if (!game) {
         throw new Error("Game does not exist!");
       }
-      console.log(game)
+      console.log(game);
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
-      return game
-      
+      return game;
     },
   },
   Game: {
@@ -167,50 +159,11 @@ const gameResolver: Resolvers = {
   },
   Subscription: {
     gameInfo: {
-      subscribe: (_, args, { ctx, prisma }) => ({
+      subscribe: (_, args) => ({
         [Symbol.asyncIterator]() {
-          console.log("trigeered")
-          const verify = async () => {
-            const user = await (prisma as PrismaClient).user
-              .findUnique({
-                where: { id: ctx.extra.request.session?.userId },
-              })
-              .catch(() => {
-                args.gameUUID = "";
-                return;
-              });
-            console.log(user);
-            if (!user) {
-              args.gameUUID = "";
-              return;
-            }
-
-            const game = await prisma.game
-              .findUnique({
-                where: {
-                  gameUUID: args.gameUUID,
-                },
-              })
-              .catch(() => {
-                args.gameUUID = "";
-                return;
-              });
-            if (!game) {
-              args.gameUUID = "";
-              return;
-            }
-            if (
-              game.joinedId !== ctx.extra.request.session?.userId ||
-              game.createdId !== ctx.extra.request.session?.userId
-            ) {
-              args.gameUUID = "";
-            }
-            args.gameUUID = game.id
-            return;
-          };
-          //verify();
-
-          return pubSub.asyncIterator([`GAME_INFO_${args.gameUUID}`]);
+          return pubSub.asyncIterator([
+            `GAME_INFO_${args.gameUUID ? args.gameUUID : null}`,
+          ]);
         },
       }),
     },
@@ -277,7 +230,6 @@ const isWinner = (
       ) {
         counter++;
       }
-  
     }
     if (counter === 3) {
       return true;
@@ -290,9 +242,11 @@ const verifyMove = (gameBoard: string[], proposedMove: number[]): boolean => {
   if (gameBoard[proposedMove[0]].charAt(proposedMove[1]) !== "0") {
     throw new Error(`${[proposedMove[0]][proposedMove[1]]} is taken`);
   }
-  if (gameBoard.length <= proposedMove[0]){
+  if (gameBoard.length <= proposedMove[0]) {
     if (gameBoard[proposedMove[0] + 1].charAt(proposedMove[1]) !== "0") {
-      throw new Error(`${[proposedMove[0]][proposedMove[1]]} is a floating move`);
+      throw new Error(
+        `${[proposedMove[0]][proposedMove[1]]} is a floating move`
+      );
     }
   }
   if (proposedMove[0] > 6 || proposedMove[1] > 7) {
