@@ -191,28 +191,26 @@ const gameResolver: Resolvers = {
       return game;
     },
   },
-  Game: {
-    async created(parent, _, context: MyContext) {
-      return await context.prisma.user.findUnique({
-        where: { id: parent.createdId },
-      });
-    },
-    async joined(parent, _, context: MyContext) {
-      if (!parent.joinedID) return null;
-      return await context.prisma.user.findUnique({
-        where: { id: parent.joinedID },
-      });
-    },
-  },
   Subscription: {
     gameInfo: {
       subscribe: (_, args) => ({
         [Symbol.asyncIterator]() {
-          return pubSub.asyncIterator([
-            `GAME_INFO_${args.gameUUID ? args.gameUUID : null}`,
-          ]);
+          return pubSub.asyncIterator([`GAME_INFO_${args.gameUUID}`]);
         },
       }),
+    },
+  },
+  Game: {
+    async created(parent, _, context: MyContext): Promise<User | null> {
+      return await context.prisma.user.findUnique({
+        where: { id: parent.createdId },
+      });
+    },
+    async joined(parent, _, context: MyContext): Promise<User | null> {
+      if (!parent.joinedID) return null;
+      return await context.prisma.user.findUnique({
+        where: { id: parent.joinedID },
+      });
     },
   },
 };
