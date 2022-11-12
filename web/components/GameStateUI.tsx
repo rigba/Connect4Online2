@@ -16,15 +16,13 @@ import { sleep } from "../utils/sleep";
 const GameStateUI = ({
   game,
   user,
-  timer,
+  timeLeft,
   gameId,
-  setTimer,
 }: {
   game: LazyQueryResult<FetchGameQuery, {}>;
   user: QueryResult<MeQuery>;
-  timer: { timePassed: number; stroke: string; active: boolean };
+  timeLeft: number;
   gameId: string;
-  setTimer;
 }) => {
   const [username, setUsername] = useState("");
   const [formError, setFormError] = useState({
@@ -33,35 +31,6 @@ const GameStateUI = ({
 
   const [createUser, createuser] = useMutation(CreateUserDocument);
   const [joinGame, joinGameRes] = useMutation(JoinGameDocument);
-  const [isTurn, setIsTurn] = useState(false);
-
-  const startTimer = () => {
-    if (timer.active) return;
-    setTimer({ ...timer, active: true });
-
-    let time = setInterval(() => {
-      setTimer({
-        stroke: (((14 - timer.timePassed) / 16) * 283).toFixed(0),
-        timePassed: (timer.timePassed += 1),
-        active: true,
-      });
-      if (timer.timePassed >= 15) {
-        setTimer({ timePassed: 0, stroke: "283", active: false });
-        clearInterval(time);
-        return;
-      }
-    }, 1000);
-  };
-
-  useEffect(() => {
-    if (!game?.data?.fetchGame?.whoseMove || !user.data?.me?.id) return;
-    if (game?.data?.fetchGame.whoseMove === user.data.me.id && !isTurn) {
-      startTimer();
-      setIsTurn(true);
-    } else {
-      setIsTurn(false);
-    }
-  }, [game]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -162,7 +131,9 @@ const GameStateUI = ({
               </g>
               <path
                 id="base-timer-path-remaining"
-                style={{ strokeDasharray: `${timer.stroke} 283` }}
+                style={{
+                  strokeDasharray: `${((timeLeft / 16) * 283).toFixed(0)} 283`,
+                }}
                 className="stroke-green-500 timer-outline fill-transparent transform rotate-90 timer-ticker"
                 d="
       M 50, 50
@@ -173,7 +144,7 @@ const GameStateUI = ({
               ></path>
             </svg>
             <span className="absolute top-0 flex justify-center w-full h-full">
-              <div className="my-auto public-lg">{15 - timer.timePassed}</div>
+              <div className="my-auto public-lg">{timeLeft}</div>
             </span>
           </div>
         </div>

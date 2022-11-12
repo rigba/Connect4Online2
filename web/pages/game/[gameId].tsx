@@ -30,11 +30,6 @@ const initBoard = [
 
 const Game: NextPage = (xd) => {
   const [hovered, setHovered] = useState<[number, number]>([9, 9]);
-  const [timer, setTimer] = useState({
-    timePassed: 0,
-    stroke: "283",
-    active: false,
-  });
   const router = useRouter();
   const { gameId } = router.query;
   const [userRes, setUserRes] = useState<QueryResult<MeQuery>>();
@@ -42,6 +37,9 @@ const Game: NextPage = (xd) => {
     ssr: false,
     variables: { gameId },
   });
+  const [movePiece, movePieceRes] = useMutation(MovePieceDocument);
+  const [timeLeft, { start: startTimer, pause: pauseTimer, resume: resumeTimer, reset: resetTimer }] = useCountDown(15500, 500);
+
   useEffect(() => {
     if (!gameId) return;
     const subscribe = async () => {
@@ -49,23 +47,55 @@ const Game: NextPage = (xd) => {
       gameInfo.subscribeToMore({
         document: GameInfoDocument,
         variables: { gameUUID: gameId as string },
+
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
           return Object.assign({}, prev);
         },
       });
     };
-    subscribe()
+    subscribe();
   }, [gameId]);
 
-  const findDrop = (column): [number, number] => {
-    for (let i = 0; i < initBoard.length; i++) {
-      if (initBoard[i].charAt(column) !== "0") {
+  const findDrop = (column, gameBoard: string[]): [number, number] => {
+    for (let i = 1; i < gameBoard.length; i++) {
+      if (gameBoard[i].charAt(column) !== "0") {
         return [i - 1, column];
       }
     }
-    return [initBoard.length - 1, column];
+    return [gameBoard.length - 1, column];
   };
+
+  console.log(timeLeft)
+  if (gameInfo.data?.fetchGame?.joinedID && typeof window !== "undefined" && timeLeft === 500 && gameInfo.data?.fetchGame?.whoseMove == userRes?.data?.me?.id){
+      movePiece({
+        variables: {
+          gameId: gameInfo.data.fetchGame.id,
+          pieceLocation: null,
+        },
+      });
+      typeof window !== "undefined"
+      ? resetTimer()
+      : null;
+      typeof window !== "undefined"
+      ? pauseTimer()
+      : null;
+
+  }
+
+  useEffect(() => {
+    if (gameInfo?.data?.fetchGame?.whoseMove && userRes.data?.me?.id) {
+      if (
+        gameInfo?.data?.fetchGame.whoseMove === userRes.data.me.id &&
+        gameInfo?.data?.fetchGame?.joinedID
+      ) {
+        typeof window !== "undefined"
+        ? startTimer()
+        : null;
+      }
+    }
+  }, [gameInfo?.data?.fetchGame?.whoseMove, gameInfo?.data?.fetchGame?.joinedID]);
+
 
   return (
     <div className="mx-4 h-screen overflow-auto">
@@ -132,8 +162,7 @@ const Game: NextPage = (xd) => {
           <GameStateUI
             game={gameInfo}
             user={userRes}
-            timer={timer}
-            setTimer={setTimer}
+            timeLeft={Math.floor((timeLeft - 500) / 1000)}
             gameId={gameId as string}
           />
         </div>
