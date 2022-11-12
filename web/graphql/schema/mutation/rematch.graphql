@@ -1,16 +1,18 @@
-subscription gameInfo($gameUUID: String!) {
-  gameInfo(gameUUID: $gameUUID) {
+mutation Rematch($gameId: String!) {
+  rematch(gameId: $gameId) {
     id
     gameBoard
     whoseMove
     winner
+    gameUUID
     joined {
       id
+      username
     }
     created {
       id
+      username
     }
-    gameUUID
     createdId
     joinedID
     rematch

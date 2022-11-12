@@ -7,5 +7,14 @@ query FetchGame($gameId: String!) {
     gameUUID
     createdId
     joinedID
+    joined {
+      id
+      username
+    }
+    created {
+      id
+      username
+    }
+    rematch
   }
 }

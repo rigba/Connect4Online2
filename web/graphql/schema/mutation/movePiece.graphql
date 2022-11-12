@@ -1,4 +1,4 @@
-mutation MovePiece($pieceLocation: [Int]!, $gameId: Int!) {
+mutation MovePiece($pieceLocation: [Int], $gameId: Int!) {
   movePiece(pieceLocation: $pieceLocation, gameId: $gameId) {
     id
     gameBoard
