@@ -1,14 +1,14 @@
+import { runHttpQuery } from "apollo-server-core";
 import { MyContext, pubSub } from "src/types";
 import { Resolvers, User } from "../../resolvers-types";
 
 export const userResolver: Resolvers = {
   Query: {
-    me: async (_, _args, { req, prisma }: MyContext): Promise<User> => {
-      const user = await prisma.user
-        .findUnique({ where: { id: req.session?.userId } })
-        .catch(() => {
-          throw new Error("Not logged in");
-        });
+    me: async (_, _args, context: MyContext): Promise<User> => {
+      if (!context.req?.session?.userId) throw new Error("Not logged in!");
+      const user = await context.prisma.user.findUnique({
+        where: { id: context.req?.session?.userId },
+      });
       if (!user) {
         throw new Error("User does not exist");
       }
@@ -30,7 +30,6 @@ export const userResolver: Resolvers = {
         throw new Error("Error creating user");
       }
       req.session.userId = user.id;
-      console.log(req.session);
       return user;
     },
     deleteUser: async (
@@ -49,7 +48,6 @@ export const userResolver: Resolvers = {
         req.session.destroy((err) => {
           res.clearCookie("connect4");
           if (err) {
-            console.log(err);
             resolve(false);
             return;
           }
