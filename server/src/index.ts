@@ -60,6 +60,35 @@ const conn = async () => {
     typeDefs,
     resolvers: [userResolver, gameResolver],
   });
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/graphql",
+  });
+
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: createContext,
+      onConnect(ctx) {
+        
+        const promise:
+          | Promise<Record<string, unknown> | boolean | void>
+          | Record<string, unknown>
+          | boolean
+          | void = new Promise((resolve, _reject) => {
+          const req = ctx.extra.request as MyContext["req"];
+
+          sessionMiddleWare(req, {} as any, () => {
+            const userId = req.session?.userId;
+            return resolve({ userId });
+          });
+        });
+
+        return promise;
+      },
+    },
+    wsServer
+  );
 
   const server = new ApolloServer({
     schema,
@@ -80,47 +109,10 @@ const conn = async () => {
         },
       },
     ],
-    context: createContext,
+    context: createContext
   });
 
-  const wsServer = new WebSocketServer({
-    server: httpServer,
-    path: "/graphql",
-  });
-
-  const serverCleanup = useServer(
-    {
-      schema,
-      context: (ctx, args, msgs) => {
-        return {
-          ctx,
-          args,
-          msgs,
-          prisma, 
-        };
-      },
-      onConnect(ctx) {
-        
-        const promise:
-          | Promise<Record<string, unknown> | boolean | void>
-          | Record<string, unknown>
-          | boolean
-          | void = new Promise((resolve, _reject) => {
-          const req = ctx.extra.request as MyContext["req"];
-
-          sessionMiddleWare(req, {} as any, () => {
-            const userId = req.session?.userId;
-            return resolve({ userId });
-          });
-        });
-
-        return promise;
-      },
-    },
-
-    wsServer
-  );
-    await server.start();
+  await server.start();
 
   server.applyMiddleware({
     app,
