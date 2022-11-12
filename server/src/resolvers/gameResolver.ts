@@ -2,6 +2,7 @@ import { Game, Resolvers } from "resolvers-types";
 import { MyContext, pubSub } from "../types";
 import { v4 as uuidv4 } from "uuid";
 import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 
 const gameResolver: Resolvers = {
   Mutation: {
@@ -28,6 +29,7 @@ const gameResolver: Resolvers = {
             gameUUID: uuidv4(),
             whoseMove: user.id,
             createdId: user.id,
+            rematch: []
           },
         });
       } catch (err) {
@@ -84,16 +86,54 @@ const gameResolver: Resolvers = {
         throw new Error("Game does not exist!");
       }
 
+      if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
       if (!user) {
         throw new Error("Error creating user");
       }
+      if (game.whoseMove !== user.id){
+        throw new Error("Not your move");
+      }
+
+      if (game.winner){
+        pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
+        return game
+      }
+
+      if (!game.gameBoard[0].includes("0")) {
+        //gameboard full
+        game.gameBoard = [
+          "0000000",
+          "0000000",
+          "0000000",
+          "0000000",
+          "0000000",
+          "0000000",
+        ];
+        pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
+        return context.prisma.game.update({
+          where: { id: args.gameId },
+          data: game,
+        });
+      }
+      if (!args.pieceLocation) {
+        args.pieceLocation = findRandomMove(game.gameBoard);
+      }
 
       if (!verifyMove(game.gameBoard, args.pieceLocation as number[])) {
         throw new Error("Invalid Move");
       }
+
+      let row: string | string[] =
+        game.gameBoard[args.pieceLocation[0] as number];
+      row = (row as string).split("");
+      row[args.pieceLocation[1] as number] =
+        user.id === game.createdId ? "1" : "2";
+      row = row.join("");
+
+      game.gameBoard[args.pieceLocation[0] as number] = row;
 
       if (
         isWinner(
@@ -103,6 +143,11 @@ const gameResolver: Resolvers = {
         )
       ) {
         game.winner = user.id;
+        pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
+        return context.prisma.game.update({
+          where: { id: args.gameId },
+          data: game,
+        });
       }
 
       let row: string | string[] =
