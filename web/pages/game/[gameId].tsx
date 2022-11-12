@@ -7,6 +7,7 @@ import {
   QueryResult,
   SubscriptionResult,
   useLazyQuery,
+  useMutation,
   useQuery,
   useSubscription,
 } from "@apollo/client";
@@ -16,19 +17,22 @@ import {
   GameInfoDocument,
   GameInfoSubscription,
   MeQuery,
+  MovePieceDocument,
 } from "../../graphql/generated/graphql";
 import GameStateUI from "../../components/GameStateUI";
+import useCountDown from 'react-countdown-hook';
 
-const initBoard = [
-  "0000000",
-  "0000000",
-  "0000000",
-  "0000000",
-  "0000000",
-  "0000000",
-]
 
 const Game: NextPage = (xd) => {
+  let gameBoard = [
+    "0000000",
+    "0000000",
+    "0000000",
+    "0000000",
+    "0000000",
+    "0000000",
+  ];
+
   const [hovered, setHovered] = useState<[number, number]>([9, 9]);
   const router = useRouter();
   const { gameId } = router.query;
@@ -105,8 +109,11 @@ const Game: NextPage = (xd) => {
         className="flex flex-wrap flex-row justify-center gap-5 rounded-lg bg-slate-800 max-w-5xl mx-auto px-5 py-12 group my-auto"
         onClick={() => console.log(gameInfo.data, userRes.data)}
       >
-        <div className="initBoard w-full max-w-lg">
-          {initBoard.map((val, i) => {
+        <div className="gameBoard w-full max-w-lg">
+          {(gameInfo?.data?.fetchGame?.gameBoard
+            ? gameInfo?.data?.fetchGame?.gameBoard
+            : gameBoard
+          ).map((val, i) => {
             const row = val.split("").map((val2, j) => {
               return (
                 <div
@@ -122,7 +129,52 @@ const Game: NextPage = (xd) => {
                   absolute w-full h-full`}
                     viewBox="0 0 500 500"
                     xmlns="http://www.w3.org/2000/svg"
-                    onMouseEnter={() => setHovered(findDrop(j))}
+                    onClick={async () => {
+                      if (
+                        !gameInfo?.data?.fetchGame ||
+                        gameInfo?.data?.fetchGame?.whoseMove !==
+                          userRes.data?.me?.id ||
+                        !gameInfo.data?.fetchGame?.joinedID
+                      ) {
+                        return;
+                      }
+                      console.log(
+                        findDrop(
+                          j,
+                          gameInfo?.data?.fetchGame?.gameBoard
+                            ? gameInfo?.data?.fetchGame?.gameBoard
+                            : gameBoard
+                        )
+                      );
+                      await movePiece({
+                        variables: {
+                          gameId: gameInfo.data.fetchGame.id,
+                          pieceLocation: findDrop(
+                            j,
+                            gameInfo?.data?.fetchGame?.gameBoard
+                              ? gameInfo?.data?.fetchGame?.gameBoard
+                              : gameBoard
+                          ),
+                        },
+                      });
+                      typeof window !== "undefined"
+                      ? resetTimer()
+                      : null;
+                      typeof window !== "undefined"
+                      ? pauseTimer()
+                      : null;
+
+                    }}
+                    onMouseEnter={() => {
+                      setHovered(
+                        findDrop(
+                          j,
+                          gameInfo?.data?.fetchGame?.gameBoard
+                            ? gameInfo?.data?.fetchGame?.gameBoard
+                            : gameBoard
+                        )
+                      );
+                    }}
                   >
                     <path
                       d="M-1.047-1.397H500.35V500H-1.047V-1.397Zm253.506 48.643c-112.112 0-202.993 90.881-202.993 202.993 0 112.106 90.881 202.987 202.993 202.987 112.111 0 202.992-90.881 202.992-202.987 0-112.112-90.881-202.993-202.992-202.993Z"
@@ -134,7 +186,10 @@ const Game: NextPage = (xd) => {
                     <ellipse
                       className={
                         val2 === "0"
-                          ? hovered[0] === i && hovered[1] === j
+                          ? hovered[0] === i &&
+                            hovered[1] === j &&
+                            gameInfo?.data?.fetchGame?.whoseMove ===
+                              userRes?.data?.me?.id
                             ? `hover-ani ${
                                 gameInfo.data?.fetchGame?.createdId ==
                                 userRes?.data?.me?.id
@@ -158,7 +213,7 @@ const Game: NextPage = (xd) => {
             return row;
           })}
         </div>
-        <div className="rounded-xl mx-2 shadow-lg bg-gray-600 p-4 my-auto">
+        <div className="rounded-xl mx-2 shadow bg-slate-700 p-4 my-auto">
           <GameStateUI
             game={gameInfo}
             user={userRes}
