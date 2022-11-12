@@ -96,7 +96,7 @@ const GameStateUI = ({
         </div>
         <div className="p-2" />
         <h1
-          className="bg-gray-700 rounded-md p-2 font-public-rg hover:underline text-sm mx-2"
+          className="bg-slate-800 rounded-md p-2 font-public-rg hover:underline text-sm mx-2"
           onClick={() =>
             navigator.clipboard.writeText(
               `www.connect4online.xyz/game/${gameId}`

@@ -102,8 +102,8 @@ const Game: NextPage = (xd) => {
       <Taskbar passUser={setUserRes} />
       <div className="p-0 md:p-2" />
       <div
-        className="flex flex-wrap flex-row justify-center gap-5 rounded-lg bg-gray-700 max-w-5xl mx-auto px-5 py-12 group shadow-2xl my-auto"
-        onClick={() => console.log(gameInfo)}
+        className="flex flex-wrap flex-row justify-center gap-5 rounded-lg bg-slate-800 max-w-5xl mx-auto px-5 py-12 group my-auto"
+        onClick={() => console.log(gameInfo.data, userRes.data)}
       >
         <div className="initBoard w-full max-w-lg">
           {initBoard.map((val, i) => {

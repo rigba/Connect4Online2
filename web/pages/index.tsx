@@ -60,7 +60,7 @@ const Home: NextPage = () => {
           <BoardVector className="" />
         </div>
         <form
-          className="rounded-xl mx-4 max-w-xl shadow-lg bg-slate-700 p-4 px-9 h-fit my-auto"
+          className="rounded-xl mx-4 max-w-xl shadow bg-slate-700 p-4 px-9 h-fit my-auto"
           onSubmit={handleSubmit}
         >
           <div className="grid w-full text-center flex-col justify-center h-fit" onClick={() => null}>

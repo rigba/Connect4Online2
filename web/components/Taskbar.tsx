@@ -26,7 +26,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
   }, [meRes.data]);
 
   return (
-    <div className="flex rounded-xl mx-auto max-w-4xl shadow-lg my-5 bg-gray-700 p-4 px-4">
+    <div className="flex rounded-xl mx-auto max-w-4xl my-5 bg-slate-800 p-4 px-4">
       <button className="text-3xl md:text-5xl font-public-xl mr-auto my-auto">
         <div className="bg-blue-700 flex flex-row gap-3 py-2 md:py-1 px-4 rounded-md shadow-md">
           <h1 className="text-red-500 my-auto">C</h1>
@@ -69,7 +69,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute z-50 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               {!meRes.data?.me ? (
                 <>
                   <div className="px-1 py-1 ">
