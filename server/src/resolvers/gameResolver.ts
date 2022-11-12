@@ -177,6 +177,58 @@ const gameResolver: Resolvers = {
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
       return game;
     },
+    rematch: async (_, args, context: MyContext): Promise<Game> => {
+      let game = await context.prisma.game
+        .findUniqueOrThrow({
+          where: { gameUUID: String(args.gameId) },
+        })
+        .catch();
+      if (!game) {
+        throw new Error("Game does not exist");
+      }
+      if (!context.req.session.userId) throw new Error("Not logged in");
+      const user = await context.prisma.user.findUnique({
+        where: { id: context.req.session?.userId },
+      });
+      if (!user){
+        throw new Error("User is not logged in");
+      }
+      if (game.rematch){
+        if (!game.rematch.includes(user.id)){
+          game.rematch = [...game.rematch, user.id]
+        } else {
+          throw new Error("Already rematched");
+        }
+      } else {
+        game.rematch = [user.id]
+      }
+      if (game.rematch.length === 2){
+        game.gameBoard = [
+          "0000000",
+          "0000000",
+          "0000000",
+          "0000000",
+          "0000000",
+          "0000000",
+        ];
+        game.whoseMove = game.joinedID === game.winner ? game.createdId : game.joinedID as number
+        game.winner = null
+        game.rematch = []
+      }
+      
+      try {
+        game = await context.prisma.game.update({
+          where: { id: game.id },
+          data: game,
+        });
+      } catch (err) {
+        throw new Error("Game could not save");
+      }
+      console.log(game)
+      pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
+      return game;
+    },
+
   },
   Query: {
     fetchGame: async (_, args, context: MyContext): Promise<Game> => {

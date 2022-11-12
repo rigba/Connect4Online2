@@ -23,6 +23,7 @@ export type Game = {
   id: Scalars['Int'];
   joined?: Maybe<User>;
   joinedID?: Maybe<Scalars['Int']>;
+  rematch?: Maybe<Array<Maybe<Scalars['Int']>>>;
   whoseMove: Scalars['Int'];
   winner?: Maybe<Scalars['Int']>;
 };
@@ -35,6 +36,7 @@ export type Mutation = {
   deleteUser?: Maybe<Scalars['Boolean']>;
   joinGame?: Maybe<Game>;
   movePiece?: Maybe<Game>;
+  rematch?: Maybe<Game>;
 };
 
 
@@ -55,7 +57,12 @@ export type MutationJoinGameArgs = {
 
 export type MutationMovePieceArgs = {
   gameId: Scalars['Int'];
-  pieceLocation: Array<InputMaybe<Scalars['Int']>>;
+  pieceLocation?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+};
+
+
+export type MutationRematchArgs = {
+  gameId: Scalars['String'];
 };
 
 export type Query = {
@@ -186,6 +193,7 @@ export type GameResolvers<ContextType = any, ParentType extends ResolversParentT
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   joined?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   joinedID?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  rematch?: Resolver<Maybe<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
   whoseMove?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   winner?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -197,7 +205,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username'>>;
   deleteUser?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   joinGame?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType, RequireFields<MutationJoinGameArgs, 'gameId'>>;
-  movePiece?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType, RequireFields<MutationMovePieceArgs, 'gameId' | 'pieceLocation'>>;
+  movePiece?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType, RequireFields<MutationMovePieceArgs, 'gameId'>>;
+  rematch?: Resolver<Maybe<ResolversTypes['Game']>, ParentType, ContextType, RequireFields<MutationRematchArgs, 'gameId'>>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

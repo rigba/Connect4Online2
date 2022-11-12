@@ -8,20 +8,21 @@ datasource db {
 }
 
 model Game {
-  id        Int    @id() @default(autoincrement())
+  id        Int      @id() @default(autoincrement())
   gameBoard String[]
   whoseMove Int
   winner    Int?
-  gameUUID  String @db.VarChar @unique
-  created    User   @relation(fields: [createdId], references: [id], "created")
+  gameUUID  String   @unique @db.VarChar
+  created   User     @relation(fields: [createdId], references: [id], "created")
   createdId Int
-  joined    User?   @relation(fields: [joinedID], references: [id], "joined")
+  joined    User?    @relation(fields: [joinedID], references: [id], "joined")
   joinedID  Int?
+  rematch   Int[]
 }
 
 model User {
   id       Int    @id() @default(autoincrement())
   username String @unique() @db.VarChar
-  created Game[] @relation("created")
-  joined Game[] @relation("joined")
+  created  Game[] @relation("created")
+  joined   Game[] @relation("joined")
 }

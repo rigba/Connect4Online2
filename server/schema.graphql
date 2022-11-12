@@ -9,7 +9,8 @@ type Mutation {
   deleteUser: Boolean
   createGame: Game
   joinGame(gameId: String!): Game
-  movePiece(pieceLocation: [Int]!, gameId: Int!): Game
+  movePiece(pieceLocation: [Int], gameId: Int!): Game
+  rematch(gameId: String!): Game
 }
 
 type Subscription {
@@ -26,6 +27,7 @@ type Game {
   created: User
   createdId: Int!
   joinedID: Int
+  rematch: [Int]
 }
 
 type User {
