@@ -230,9 +230,10 @@ const isWinner = (
       [-3, -2, -1], // 1 1 1 X
     ],
     [
-      [true, false], // vertical
-      [false, true], // hortizontal
-      [true, true], // diagonal
+      [1, 0], // vertical
+      [0, 1], // hortizontal
+      [1, 1], // diagonal left
+      [-1, 1], // diagonal right
     ],
   ];
 
@@ -240,18 +241,15 @@ const isWinner = (
     (directions) => {
       return oneDimesionalVectors.map((oneDVectors) => {
         return [
-          [
-            directions[0] ? oneDVectors[0] : 0,
-            directions[1] ? oneDVectors[0] : 0,
-          ],
-          [
-            directions[0] ? oneDVectors[1] : 0,
-            directions[1] ? oneDVectors[1] : 0,
-          ],
-          [
-            directions[0] ? oneDVectors[2] : 0,
-            directions[1] ? oneDVectors[2] : 0,
-          ],
+           [
+              oneDVectors[0] * directions[0], oneDVectors[0]  * directions[1]
+            ],
+            [
+              oneDVectors[1] * directions[0], oneDVectors[1] * directions[1]
+            ],
+            [
+              oneDVectors[2] * directions[0], oneDVectors[2] * directions[1]
+            ]
         ];
       });
     }
@@ -261,15 +259,13 @@ const isWinner = (
     let counter = 0;
     for (let vectors of vectorGroup) {
       if (
-        proposedMove[0] + vectors[0] < 0 ||
+        proposedMove[0] + vectors[0] < 0 || // -3, -3
         proposedMove[1] + vectors[1] < 0 ||
         proposedMove[0] + vectors[0] >= gameBoard.length ||
         proposedMove[1] + vectors[1] >= gameBoard[0].length
       ) {
-        continue; // out of bounds
+        continue;
       }
-      console.log(proposedMove[0],  vectors[0],
-        proposedMove[1],  vectors[1])
       if (
         gameBoard[proposedMove[0] + vectors[0]].charAt(
           proposedMove[1] + vectors[1]
@@ -279,6 +275,7 @@ const isWinner = (
       }
     }
     if (counter === 3) {
+
       return true;
     }
   }
@@ -286,6 +283,14 @@ const isWinner = (
 };
 
 const verifyMove = (gameBoard: string[], proposedMove: number[]): boolean => {
+  if (
+    proposedMove[0] > 6 ||
+    proposedMove[1] > 7 ||
+    proposedMove[0] < 0 ||
+    proposedMove[1] < 0
+  ) {
+    throw new Error(`${[proposedMove[0]][proposedMove[1]]} is out of bounds`);
+  }
   if (gameBoard[proposedMove[0]].charAt(proposedMove[1]) !== "0") {
     throw new Error(`${[proposedMove[0]][proposedMove[1]]} is taken`);
   }
@@ -296,11 +301,27 @@ const verifyMove = (gameBoard: string[], proposedMove: number[]): boolean => {
       );
     }
   }
-  if (proposedMove[0] > 6 || proposedMove[1] > 7) {
-    throw new Error(`${[proposedMove[0]][proposedMove[1]]} is out of bounds`);
-  }
 
   return true;
+};
+
+const findRandomMove = (gameBoard: string[]) => {
+  let potentialMoves: [number, number][] = [];
+
+  for (let i = 0; i < gameBoard[0].length; i++) {
+    for (let j = 0; j < gameBoard.length; j++) {
+      if (j === gameBoard.length - 1 && gameBoard[j].charAt(i) === "0") {
+        potentialMoves.push([j, i]);
+        break;
+      }
+      if (gameBoard[j].charAt(i) !== "0" && j - 1 >= 0) {
+        potentialMoves.push([j - 1, i]);
+        break;
+      }
+    }
+  }
+  if (potentialMoves.length === 0) throw new Error("big problem");
+  return potentialMoves[Math.floor(Math.random() * potentialMoves.length)];
 };
 
 export default gameResolver;
