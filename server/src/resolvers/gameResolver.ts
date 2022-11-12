@@ -1,7 +1,6 @@
 import { Game, Resolvers } from "resolvers-types";
 import { MyContext, pubSub } from "../types";
 import { v4 as uuidv4 } from "uuid";
-import { PrismaClient } from "@prisma/client";
 import { PrismaClient, User } from "@prisma/client";
 
 const gameResolver: Resolvers = {
