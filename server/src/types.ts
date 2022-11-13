@@ -5,8 +5,16 @@ import { PrismaClient } from "@prisma/client";
 import { RedisPubSub } from "graphql-redis-subscriptions";
 
 export const pubSub = new RedisPubSub({
-  publisher: new Redis(),
-  subscriber: new Redis(),
+  publisher: new Redis(
+    process.env.REDIS_URL
+      ? process.env.REDIS_URL as string
+      : "redis://localhost:6379"
+  ),
+  subscriber: new Redis(
+    process.env.REDIS_URL
+      ? process.env.REDIS_URL as string
+      : "redis://localhost:6379"
+  ),
 });
 
 export const prisma = new PrismaClient();
