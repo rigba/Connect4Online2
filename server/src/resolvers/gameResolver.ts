@@ -149,15 +149,6 @@ const gameResolver: Resolvers = {
         });
       }
 
-      let row: string | string[] =
-        game.gameBoard[args.pieceLocation[0] as number];
-      row = (row as string).split("");
-      row[args.pieceLocation[1] as number] =
-        user.id === game.createdId ? "1" : "2";
-      row = row.join("");
-
-      game.gameBoard[args.pieceLocation[0] as number] = row;
-
       game.whoseMove =
         game.createdId === context.req.session.userId
           ? (game.joinedID as number)
