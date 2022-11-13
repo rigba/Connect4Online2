@@ -13,7 +13,6 @@ import {
   MeQuery,
   RematchDocument,
 } from "../graphql/generated/graphql";
-import { sleep } from "../utils/sleep";
 
 const GameStateUI = ({
   game,
