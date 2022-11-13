@@ -40,6 +40,8 @@ const conn = async () => {
       : "redis://localhost:6379"
   );
 
+  app.set('trust proxy', 1);
+
   const sessionMiddleWare = session({
     name: "connect4",
     secret: "mySecret",
@@ -51,7 +53,7 @@ const conn = async () => {
       maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
       httpOnly: false,
       sameSite: "none",
-      //secure: true,
+      secure: true,
     },
     saveUninitialized: false,
     resave: false,
