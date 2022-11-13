@@ -13,7 +13,7 @@ import connectRedis from "connect-redis";
 import Redis from "ioredis";
 import { createContext, MyContext, prisma } from "./types";
 import { readFileSync } from "node:fs";
-import { userResolver } from "./resolvers/userResolver"; 
+import { userResolver } from "./resolvers/userResolver";
 import gameResolver from "./resolvers/gameResolver";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
@@ -25,32 +25,33 @@ const httpServer = createServer(app);
 const conn = async () => {
   const corsOptions: cors.CorsOptions = {
     origin: process.env.FRONT_END_LINK,
-    credentials: true
-  }
+    credentials: true,
+  };
 
-  app.use(
-    cors(corsOptions)  
-  );
+  app.use(cors(corsOptions));
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis(parseInt(process.env.REDIS_PORT as string), process.env.REDIS_HOST as string);
+  const redis = new Redis(
+    process.env.REDIS_URL
+      ? { path: process.env.REDIS_URL }
+      : { host: undefined, port: undefined }
+  );
 
   const sessionMiddleWare = session({
     name: "connect4",
     secret: "mySecret",
     store: new RedisStore({
-        client: redis,
-        disableTouch: true,
-      }),
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
-        httpOnly: true,
-        sameSite: "lax",
-        secure: false,
-      },
-      saveUninitialized: false,
-      resave: false,
-      
+      client: redis,
+      disableTouch: true,
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    },
+    saveUninitialized: false,
+    resave: false,
   });
 
   app.use(sessionMiddleWare);
@@ -71,7 +72,6 @@ const conn = async () => {
       schema,
       context: createContext,
       onConnect(ctx) {
-        
         const promise:
           | Promise<Record<string, unknown> | boolean | void>
           | Record<string, unknown>
@@ -94,7 +94,10 @@ const conn = async () => {
   const server = new ApolloServer({
     schema,
     plugins: [
-      ApolloServerPluginLandingPageLocalDefault({ includeCookies: true, embed: true, }),
+      ApolloServerPluginLandingPageLocalDefault({
+        includeCookies: true,
+        embed: true,
+      }),
       // Proper shutdown for the HTTP server.
       ApolloServerPluginDrainHttpServer({ httpServer }),
 
@@ -110,7 +113,7 @@ const conn = async () => {
         },
       },
     ],
-    context: createContext
+    context: createContext,
   });
 
   await server.start();
@@ -119,7 +122,6 @@ const conn = async () => {
     app,
     cors: corsOptions,
   });
-
 
   httpServer.listen(process.env.PORT || 5000, () => {
     console.log(`server started...`);
