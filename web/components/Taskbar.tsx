@@ -21,13 +21,18 @@ const Taskbar = ({ passUser }: { passUser? }) => {
   const meRes = useQuery(MeDocument, { ssr: true });
   const [createGame, createGameInfo] = useMutation(CreateGameDocument);
   const router = useRouter();
+  const [deletePrompt, setDeletePrompt] = useState(true);
+  const [renamePrompt, setRenamePrompt] = useState(true);
 
   useEffect(() => {
     const getMe = async () => {
-      return await meRes.refetch();
+      try {
+        let res = await meRes.refetch();
+      } catch {}
     };
+    getMe();
     if (!passUser) return;
-    passUser(getMe());
+    passUser(meRes);
   }, [meRes.data]);
 
   const createGameHelper = async () => {
@@ -52,7 +57,7 @@ const Taskbar = ({ passUser }: { passUser? }) => {
           </svg>
         </div>
       </button>
-      {(meRes.data && !router.asPath.includes("game")) && (
+      {meRes.data && !router.asPath.includes("game") && (
         <button
           onClick={() => createGameHelper()}
           className="shadow-md group inline-flex items-center rounded-md bg-red-500 text-base font-medium text-white mr-2 h-full px-3 py-3 my-auto"
