@@ -246,7 +246,7 @@ const GameStateUI = ({
 
         <button
           type="submit"
-          className="text-white bg-rose-400 focus:outline-none font-medium rounded-lg text-sm w-32 px-5 py-2.5 my-1 text-center mx-auto"
+          className="text-white bg-red-500 focus:outline-none font-medium rounded-lg text-sm w-32 px-5 py-2.5 my-1 text-center mx-auto"
         >
           Join Game
         </button>

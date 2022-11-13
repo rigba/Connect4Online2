@@ -89,7 +89,7 @@ const Home: NextPage = () => {
             <button
               type="submit"
               onClick={() => console.log("button clicked")}
-              className="text-white bg-rose-400 focus:outline-none font-medium rounded-lg text-sm w-32 px-5 py-2.5 text-center mx-auto mt-4 mb-10"
+              className="text-white bg-red-500 focus:outline-none font-medium rounded-lg text-sm w-32 px-5 py-2.5 text-center mx-auto mt-4 mb-10"
             >
               Create Game
             </button>
