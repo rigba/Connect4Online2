@@ -33,8 +33,8 @@ const conn = async () => {
   const RedisStore = connectRedis(session);
   const redis = new Redis(
     process.env.REDIS_URL
-      ? { path: process.env.REDIS_URL }
-      : { host: undefined, port: undefined }
+      ? process.env.REDIS_URL as string
+      : "redis://localhost:6379"
   );
 
   const sessionMiddleWare = session({
