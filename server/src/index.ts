@@ -29,6 +29,9 @@ const conn = async () => {
   };
 
   app.use(cors(corsOptions));
+  console.log(process.env.FRONT_END_LINK)
+  console.log(process.env.REDIS_URL)
+  console.log(process.env.DATABASE_URL)
 
   const RedisStore = connectRedis(session);
   const redis = new Redis(
