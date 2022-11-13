@@ -17,13 +17,14 @@ import { userResolver } from "./resolvers/userResolver";
 import gameResolver from "./resolvers/gameResolver";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { env } from "process";
 
 const app = express();
 const httpServer = createServer(app);
 
 const conn = async () => {
   const corsOptions: cors.CorsOptions = {
-    origin: "http://localhost:3000",
+    origin: process.env.FRONT_END_LINK,
     credentials: true
   }
 
@@ -32,7 +33,7 @@ const conn = async () => {
   );
 
   const RedisStore = connectRedis(session);
-  const redis = new Redis();
+  const redis = new Redis(parseInt(process.env.REDIS_PORT as string), process.env.REDIS_HOST as string);
 
   const sessionMiddleWare = session({
     name: "connect4",
@@ -120,7 +121,7 @@ const conn = async () => {
   });
 
 
-  httpServer.listen(5000, () => {
+  httpServer.listen(process.env.PORT || 5000, () => {
     console.log(`server started...`);
   });
 };
