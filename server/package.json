@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "run": "nodemon src/index.ts",
-    "compile" : "tsc",
+    "compile" : "npm run tsc",
+    "tsc": "./node_modules/typescript/bin/tsc",
     "run-prod" : "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "codegen": "graphql-codegen --config codegen.ts"
