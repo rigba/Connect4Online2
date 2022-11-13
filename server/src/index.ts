@@ -50,8 +50,8 @@ const conn = async () => {
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
     },
     saveUninitialized: false,
     resave: false,
