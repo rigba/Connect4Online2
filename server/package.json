@@ -6,7 +6,7 @@
   "scripts": {
     "run": "nodemon src/index.ts",
     "compile": "npm run tsc",
-    "prod": "tsc && node dist/index.js",
+    "prod": "tsc && node dist/src/index.js",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "author": "",
