@@ -45,7 +45,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
     }).then((response) => response);
   };
   const httpLink = new HttpLink({
-    uri: "http://localhost:5000/graphql",
+    uri: process.env.GRAPHQL_URI, 
     fetch: enhancedFetch,
     fetchOptions: {
       mode: "cors",
@@ -57,7 +57,7 @@ const createApolloClient = (headers: IncomingHttpHeaders | null = null) => {
     typeof window !== "undefined"
       ? new GraphQLWsLink(
           createClient({
-            url: "ws://localhost:5000/graphql",
+            url: process.env.GRAPHQLWS_URI,
             
           })
         )
