@@ -51,7 +51,7 @@ const conn = async () => {
       maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
       httpOnly: false,
       sameSite: "none",
-      secure: true,
+      //secure: true,
     },
     saveUninitialized: false,
     resave: false,
