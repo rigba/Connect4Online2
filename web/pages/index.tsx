@@ -43,7 +43,7 @@ const Home: NextPage = () => {
     try {
       let game = await createGame()
       if(!game.data) return
-      router.replace(`/game/${game.data.createGame.gameUUID}`)
+      router.push(`/game/${game.data.createGame.gameUUID}`)
 
     } catch{}
   };
