@@ -6,13 +6,16 @@ import { PrismaClient, User } from "@prisma/client";
 const gameResolver: Resolvers = {
   Mutation: {
     createGame: async (_, _args, context: MyContext): Promise<Game> => {
+      console.log("Create Game: SessionID", context.req.session?.userId);
       if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
       if (!user) {
+        console.log("Create Game: Error", "Auth Error");
         throw new Error("Auth error");
       }
+      console.log("Create Game: User", user);
       let game;
       try {
         game = await context.prisma.game.create({
@@ -28,50 +31,55 @@ const gameResolver: Resolvers = {
             gameUUID: uuidv4(),
             whoseMove: user.id,
             createdId: user.id,
-            rematch: []
+            rematch: [],
           },
         });
       } catch (err) {
+        console.log("Create Game: Error", err);
         throw new Error(err);
       }
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
-
       return game;
     },
 
     joinGame: async (_, args, context: MyContext): Promise<Game> => {
-      const game = await context.prisma.game
+      let game = await context.prisma.game
         .findUniqueOrThrow({
           where: { gameUUID: String(args.gameId) },
         })
         .catch();
       if (!game) {
+        console.log("Join Game: Error", "Game does not exist");
         throw new Error("Game does not exist");
       }
-
+      console.log("Join Game: Gmae", game);
       if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
+      console.log("Join Game: User", user);
       if (!user) {
+        console.log("Join Game: Error", "Error creating user");
         throw new Error("Error creating user");
       }
-
       if (game.createdId === user.id) {
+        console.log("Join Game: Error", "Cant join own game");
         throw new Error("Cant join own game");
       }
 
       if (game.joinedID) {
+        console.log("Join Game: Error", "Game is full");
         throw new Error("Game is full");
       }
-      game.joinedID = (context.req.session?.userId) as number
+      game.joinedID = context.req.session?.userId as number;
 
       try {
-        await context.prisma.game.update({
+        game = await context.prisma.game.update({
           where: { id: game.id },
           data: game,
         });
       } catch (err) {
+        console.log("Join Game: Error", "Game could not save");
         throw new Error("Game could not save");
       }
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
@@ -82,23 +90,28 @@ const gameResolver: Resolvers = {
         where: { id: args.gameId },
       });
       if (!game) {
+        console.log("Move Piece: Error", "Game does not exist");
         throw new Error("Game does not exist!");
       }
-
+      console.log("Move Piece: UserID", context.req.session?.userId);
+      console.log("Move Piece: GameID", args.gameId);
+      console.log("Move Piece: PieceLocation", args?.pieceLocation);
       if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
       if (!user) {
-        throw new Error("Error creating user");
+        console.log("Move Piece: Error", "User does not exist");
+        throw new Error("User does not exist");
       }
-      if (game.whoseMove !== user.id){
+      if (game.whoseMove !== user.id) {
+        console.log("Move Piece: Error", "Not your move");
         throw new Error("Not your move");
       }
 
-      if (game.winner){
+      if (game.winner) {
         pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
-        return game
+        return game;
       }
 
       if (!game.gameBoard[0].includes("0")) {
@@ -122,6 +135,7 @@ const gameResolver: Resolvers = {
       }
 
       if (!verifyMove(game.gameBoard, args.pieceLocation as number[])) {
+        console.log("Move Piece: Error", "Invalid Move");
         throw new Error("Invalid Move");
       }
 
@@ -153,7 +167,6 @@ const gameResolver: Resolvers = {
         game.createdId === context.req.session.userId
           ? (game.joinedID as number)
           : game.createdId;
-      console.log(game.whoseMove)
 
       try {
         await context.prisma.game.update({
@@ -161,7 +174,7 @@ const gameResolver: Resolvers = {
           data: game,
         });
       } catch (err) {
-        console.log(err)
+        console.log("Move Piece: Error", err);
         throw new Error(err);
       }
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
@@ -174,25 +187,28 @@ const gameResolver: Resolvers = {
         })
         .catch();
       if (!game) {
+        console.log("Rematch: Error", "Game does not exist");
         throw new Error("Game does not exist");
       }
       if (!context.req.session.userId) throw new Error("Not logged in");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req.session?.userId },
       });
-      if (!user){
+      if (!user) {
+        console.log("Rematch: Error", "User does not exist");
         throw new Error("User is not logged in");
       }
-      if (game.rematch){
-        if (!game.rematch.includes(user.id)){
-          game.rematch = [...game.rematch, user.id]
+      if (game.rematch) {
+        if (!game.rematch.includes(user.id)) {
+          game.rematch = [...game.rematch, user.id];
         } else {
+          console.log("Rematch: Error", "Already rematched");
           throw new Error("Already rematched");
         }
       } else {
-        game.rematch = [user.id]
+        game.rematch = [user.id];
       }
-      if (game.rematch.length === 2){
+      if (game.rematch.length === 2) {
         game.gameBoard = [
           "0000000",
           "0000000",
@@ -201,24 +217,26 @@ const gameResolver: Resolvers = {
           "0000000",
           "0000000",
         ];
-        game.whoseMove = game.joinedID === game.winner ? game.createdId : game.joinedID as number
-        game.winner = null
-        game.rematch = []
+        game.whoseMove =
+          game.joinedID === game.winner
+            ? game.createdId
+            : (game.joinedID as number);
+        game.winner = null;
+        game.rematch = [];
       }
-      
+
       try {
         game = await context.prisma.game.update({
           where: { id: game.id },
           data: game,
         });
       } catch (err) {
+        console.log("Rematch: Error", err);
         throw new Error("Game could not save");
       }
-      console.log(game)
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
       return game;
     },
-
   },
   Query: {
     fetchGame: async (_, args, context: MyContext): Promise<Game> => {
@@ -226,9 +244,9 @@ const gameResolver: Resolvers = {
         where: { gameUUID: args.gameId },
       });
       if (!game) {
+        console.log("Fetch Game: Error", "Game does not exist!");
         throw new Error("Game does not exist!");
       }
-      console.log(game);
       pubSub.publish(`GAME_INFO_${game.gameUUID}`, { gameInfo: game });
       return game;
     },
@@ -281,15 +299,9 @@ const isWinner = (
     (directions) => {
       return oneDimesionalVectors.map((oneDVectors) => {
         return [
-           [
-              oneDVectors[0] * directions[0], oneDVectors[0]  * directions[1]
-            ],
-            [
-              oneDVectors[1] * directions[0], oneDVectors[1] * directions[1]
-            ],
-            [
-              oneDVectors[2] * directions[0], oneDVectors[2] * directions[1]
-            ]
+          [oneDVectors[0] * directions[0], oneDVectors[0] * directions[1]],
+          [oneDVectors[1] * directions[0], oneDVectors[1] * directions[1]],
+          [oneDVectors[2] * directions[0], oneDVectors[2] * directions[1]],
         ];
       });
     }
@@ -315,7 +327,6 @@ const isWinner = (
       }
     }
     if (counter === 3) {
-
       return true;
     }
   }

@@ -5,6 +5,7 @@ import { Resolvers, User } from "../../resolvers-types";
 export const userResolver: Resolvers = {
   Query: {
     me: async (_, _args, context: MyContext): Promise<User> => {
+      console.log("Me Query: UserID", context.req?.session?.userId);
       if (!context.req?.session?.userId) throw new Error("Not logged in!");
       const user = await context.prisma.user.findUnique({
         where: { id: context.req?.session?.userId },
@@ -17,6 +18,7 @@ export const userResolver: Resolvers = {
   },
   Mutation: {
     createUser: async (_, args, { req, prisma }: MyContext): Promise<User> => {
+      console.log("Create User: UserID", req?.session?.userId);
       if (args.username.length < 3) {
         throw new Error("Username too short");
       }
@@ -27,6 +29,7 @@ export const userResolver: Resolvers = {
         data: { username: args.username },
       });
       if (!user) {
+        console.log("Create User: Error", "Error creating user");
         throw new Error("Error creating user");
       }
       req.session.userId = user.id;
